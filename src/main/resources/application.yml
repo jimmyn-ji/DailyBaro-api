@@ -1,0 +1,35 @@
+#后端服务端口
+server:
+  port: 8081
+
+spring:
+  #数据库配置
+  datasource:
+    url: jdbc:mysql://localhost:3306/hanfu_db?characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: 123456
+  resources:
+    chain:
+      strategy:
+        content:
+          enabled: true
+          paths: /**
+
+mybatis:
+  type-aliases-package: com.project.hanfu.model
+
+swagger:
+  open: true
+  basePackage: com.project.hanfu.controller
+  version: 1.0.0
+  description: 汉服接口文档
+  title: 汉服接口文档
+  parameters:
+    token:
+      name: token
+      modelRef: string
+      parameterType: header
+      required: false
+
+#图片上传路径 图片所在的路径位置
+uploadPath: /Users/minchi/Desktop/网上鲜花商城/源码/flower-vue/static/imgs/
