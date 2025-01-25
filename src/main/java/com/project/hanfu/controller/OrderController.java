@@ -4,11 +4,10 @@ import com.project.hanfu.config.Constant;
 import com.project.hanfu.config.HttpMsg;
 import com.project.hanfu.mapper.OrderDao;
 import com.project.hanfu.mapper.UserDao;
-import com.project.hanfu.model.Order;
-import com.project.hanfu.model.OrderVo;
+import com.project.hanfu.model.Orders;
+import com.project.hanfu.model.OrdersVo;
 import com.project.hanfu.menu.StatusCode;
 import com.project.hanfu.result.ResultBase;
-import com.project.hanfu.model.User;
 import com.project.hanfu.service.OrderService;
 import org.springframework.web.bind.annotation.*;
 import tk.mybatis.mapper.util.StringUtil;
@@ -45,7 +44,7 @@ public class OrderController {
         if (StringUtil.isEmpty(account)) {
             return resultBase.setCode(StatusCode.ERROR).setMessage(HttpMsg.INVALID_PARAM);
         }
-        List<Order> orders = orderService.queryByAccount(account);
+        List<Orders> orders = orderService.queryByAccount(account);
         return resultBase.setCode(StatusCode.SUCCESS).setData(orders);
     }
 
@@ -53,25 +52,25 @@ public class OrderController {
     ResultBase find(@RequestParam("page") int page, @RequestParam("searchKey") String searchKey, @RequestParam("account") String account) {
         ResultBase resultBase = new ResultBase();
         Map<String, Object> map = new HashMap<>();
-        List<Order> orders = orderService.find(searchKey, account);
+        List<Orders> orders = orderService.find(searchKey, account);
         if (orders == null) {
             return resultBase.setCode(StatusCode.SUCCESS);
         }
-        List<Order> items = orders.size() >= page * Constant.PAGE_SIZE ?
+        List<Orders> items = orders.size() >= page * Constant.PAGE_SIZE ?
                 orders.subList((page - 1) * Constant.PAGE_SIZE, page * Constant.PAGE_SIZE)
                 : orders.subList((page - 1) * Constant.PAGE_SIZE, orders.size());
         int len = orders.size() % Constant.PAGE_SIZE == 0 ? orders.size() / Constant.PAGE_SIZE
                 : (orders.size() / Constant.PAGE_SIZE + 1);
-        List<OrderVo> vos = new ArrayList<>();
-        for (Order item : items) {
-            User user = userDao.queryById(item.getUid());
-            OrderVo vo = new OrderVo();
-            vo.setAddress(user.getAddress()).setPhone(user.getPhoneNo()).setUsername(user.getName())
-                    .setAmount(item.getAmount()).setFlower(item.getFlower()).setId(item.getId())
-                    .setUid(item.getUid()).setOrder_guid(item.getOrder_guid()).setPrice(item.getPrice())
-                    .setState(item.getState());
-            vos.add(vo);
-        }
+        List<OrdersVo> vos = new ArrayList<>();
+//        for (Order item : items) {
+//            User user = userDao.queryById(item.getUid());
+//            OrderVo vo = new OrderVo();
+//            vo.setAddress(user.getAddress()).setPhone(user.getPhoneNo()).setUsername(user.getName())
+//                    .setAmount(item.getAmount()).setFlower(item.getFlower()).setId(item.getId())
+//                    .setUid(item.getUid()).setOrder_guid(item.getOrder_guid()).setPrice(item.getPrice())
+//                    .setState(item.getState());
+//            vos.add(vo);
+//        }
         map.put("items", vos);
         map.put("len", len);
         return resultBase.setCode(StatusCode.SUCCESS).setData(map);
@@ -81,34 +80,34 @@ public class OrderController {
     ResultBase findAll(@RequestParam("page") int page, @RequestParam("searchKey") String searchKey) {
         ResultBase resultBase = new ResultBase();
         Map<String, Object> map = new HashMap<>();
-        List<Order> orders = orderService.findAll(searchKey);
+        List<Orders> orders = orderService.findAll(searchKey);
         if (orders == null) {
             return resultBase.setCode(StatusCode.SUCCESS);
         }
-        List<Order> items = orders.size() >= page * Constant.PAGE_SIZE ?
+        List<Orders> items = orders.size() >= page * Constant.PAGE_SIZE ?
                 orders.subList((page - 1) * Constant.PAGE_SIZE, page * Constant.PAGE_SIZE)
                 : orders.subList((page - 1) * Constant.PAGE_SIZE, orders.size());
         int len = orders.size() % Constant.PAGE_SIZE == 0 ? orders.size() / Constant.PAGE_SIZE
                 : (orders.size() / Constant.PAGE_SIZE + 1);
-        List<OrderVo> vos = new ArrayList<>();
-        for (Order item : items) {
-            User user = userDao.queryById(item.getUid());
-            OrderVo vo = new OrderVo();
-            vo.setAddress(user.getAddress()).setPhone(user.getPhoneNo()).setUsername(user.getName())
-                    .setAmount(item.getAmount()).setFlower(item.getFlower()).setId(item.getId())
-                    .setUid(item.getUid()).setOrder_guid(item.getOrder_guid()).setPrice(item.getPrice())
-                    .setState(item.getState());
-            vos.add(vo);
-        }
+        List<OrdersVo> vos = new ArrayList<>();
+//        for (Order item : items) {
+//            User user = userDao.queryById(item.getUid());
+//            OrderVo vo = new OrderVo();
+//            vo.setAddress(user.getAddress()).setPhone(user.getPhoneNo()).setUsername(user.getName())
+//                    .setAmount(item.getAmount()).setFlower(item.getFlower()).setId(item.getId())
+//                    .setUid(item.getUid()).setOrder_guid(item.getOrder_guid()).setPrice(item.getPrice())
+//                    .setState(item.getState());
+//            vos.add(vo);
+//        }
         map.put("items", vos);
         map.put("len", len);
         return resultBase.setCode(StatusCode.SUCCESS).setData(map);
     }
 
     @RequestMapping("/update")
-    ResultBase update(@RequestBody Order order) {
+    ResultBase update(@RequestBody Orders orders) {
         ResultBase resultBase = new ResultBase();
-        int ans = orderService.update(order);
+        int ans = orderService.update(orders);
         if (ans >= 0) {
             return resultBase.setCode(StatusCode.SUCCESS).setMessage(HttpMsg.UPDATE_USER_OK);
         }
@@ -116,8 +115,8 @@ public class OrderController {
     }
 
     @RequestMapping("/changeState")
-    ResultBase changeState(@RequestBody Order order) {
-        orderDao.changeState(order);
+    ResultBase changeState(@RequestBody Orders orders) {
+        orderDao.changeState(orders);
         return new ResultBase().setCode(StatusCode.SUCCESS).setMessage(HttpMsg.UPDATE_ORDER_OK);
     }
 

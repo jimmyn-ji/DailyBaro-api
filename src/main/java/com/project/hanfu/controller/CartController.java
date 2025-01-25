@@ -5,12 +5,16 @@ import com.project.hanfu.config.HttpMsg;
 import com.project.hanfu.mapper.FlowersDao;
 import com.project.hanfu.model.Cart;
 import com.project.hanfu.menu.StatusCode;
+import com.project.hanfu.model.dto.AccountDTO;
+import com.project.hanfu.model.dto.CidDTO;
 import com.project.hanfu.model.dto.InsertCartInfoDTO;
 import com.project.hanfu.model.dto.InsertUserDTO;
 import com.project.hanfu.model.vo.CartInfoVO;
+import com.project.hanfu.model.vo.OrderInfoVO;
 import com.project.hanfu.model.vo.UserInfoVO;
 import com.project.hanfu.result.ResultBase;
 import com.project.hanfu.result.ResultData;
+import com.project.hanfu.result.ResultQuery;
 import com.project.hanfu.service.CartService;
 import com.project.hanfu.service.OrderService;
 import org.springframework.web.bind.annotation.*;
@@ -40,27 +44,53 @@ public class CartController {
     private FlowersDao flowersDao;
 
     /**
+     * 添加购物车
+     * @param insertCartInfoDTO
+     * @return
+     */
+    @RequestMapping("/create")
+    ResultData<CartInfoVO> insertCartInfo(@RequestBody InsertCartInfoDTO insertCartInfoDTO) {
+        return cartService.insertCartInfo(insertCartInfoDTO);
+    }
+
+    /**
+     * 删除购物车信息
+     * @param cid
+     * @return
+     */
+    @RequestMapping("/delete")
+    ResultData<CartInfoVO> deleteCartInfo(@RequestParam("id") Long cid) {
+//        从 URL 查询字符串中接收数据并转化为 JSON
+        CidDTO cidDTO= new CidDTO();
+        cidDTO.setCid(cid);
+        return cartService.deleteCartInfo(cidDTO);
+    }
+
+    /**
      * 查询用户购物车
      *
      * @param account 用户账号
      * @return 购物车
      */
     @RequestMapping("/queryByAccount")
-    ResultBase queryByAccount(@RequestParam("account") String account) {
-        ResultBase resultBase = new ResultBase();
+    ResultQuery<CartInfoVO> queryInfoByAccount(@RequestParam("account") String account) {
+//        从 URL 查询字符串中接收数据并转化为 JSON
+        AccountDTO accountDTO = new AccountDTO();
+        accountDTO.setAccount(account);
+        return cartService.queryInfoByAccount(accountDTO);
+    }
 
-        if (StringUtil.isEmpty(account)) {
-            return resultBase.setCode(StatusCode.ERROR).setMessage(HttpMsg.INVALID_PARAM);
-        }
-
-        List<Cart> carts = cartService.queryByAccount(account);
-
-        for (Cart cart : carts) {
-            float price = flowersDao.queryPrice(cart.getFid());
-            cart.setPrice(BigDecimal.valueOf(price));
-        }
-
-        return resultBase.setCode(StatusCode.SUCCESS).setData(carts);
+    /**
+     * 购物车结算功能
+     * @param account
+     * @return
+     */
+    @RequestMapping("/buy")
+    ResultData<OrderInfoVO> checkOut(@RequestParam("account") String account){
+        // 从 URL 查询字符串中接收数据并转化为 JSON
+        AccountDTO accountDTO=new AccountDTO();
+        accountDTO.setAccount(account);
+        return cartService.checkOut(accountDTO);
     }
 
 
@@ -100,34 +130,10 @@ public class CartController {
         return resultBase.setCode(StatusCode.SUCCESS).setData(map);
     }
 
-    /**
-     * 购买
-     *
-     * @param account 账号
-     * @return 结果
-     */
-    @RequestMapping("/buy")
-    ResultBase buy(@RequestParam("account") String account) {
-        ResultBase resultBase = new ResultBase();
-
-        // 查该用户的购物车
-        List<Cart> carts = (List<Cart>) queryByAccount(account).getData();
-        for (Cart cart : carts) {
-            // 增加订单数据
-            orderService.add(cart);
-            // 删除购物车数据
-            cartService.delete(cart.getId());
-        }
-
-        return resultBase.setCode(StatusCode.SUCCESS).setMessage(HttpMsg.BUY_OK);
-    }
 
 
 
-    @RequestMapping("/create")
-    ResultData<CartInfoVO> insertCartInfo(@RequestBody InsertCartInfoDTO insertCartInfoDTO) {
-        return cartService.insertCartInfo(insertCartInfoDTO);
-    }
+
 
     /**
      * 更新购物车
@@ -148,21 +154,7 @@ public class CartController {
         return resultBase.setCode(StatusCode.ERROR).setMessage(HttpMsg.UPDATE_USER_FAILED);
     }
 
-    /**
-     * 删除购物车
-     *
-     * @param id 购物车id
-     * @return 结果
-     */
-    @DeleteMapping("/delete")
-    ResultBase delete(@RequestParam("id") int id) {
-        ResultBase resultBase = new ResultBase();
-        int ans = cartService.delete(id);
-        if (ans == 1) {
-            return resultBase.setCode(StatusCode.SUCCESS).setMessage(HttpMsg.DELETE_USER_OK);
-        }
-        return resultBase.setCode(StatusCode.ERROR).setMessage(HttpMsg.DELETE_USER_FAILED);
-    }
+
 
 }
 

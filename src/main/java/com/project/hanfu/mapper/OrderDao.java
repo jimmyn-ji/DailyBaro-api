@@ -1,7 +1,7 @@
 package com.project.hanfu.mapper;
 
 import com.project.hanfu.model.Cart;
-import com.project.hanfu.model.Order;
+import com.project.hanfu.model.Orders;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
@@ -11,24 +11,24 @@ import java.util.List;
 public interface OrderDao {
 
     @Select("select * from orders where flower like concat('%',#{searchKey},'%')  and uid = #{uid};")
-    List<Order> find(@Param("searchKey") String searchKey, @Param("uid") int uid);
+    List<Orders> find(@Param("searchKey") String searchKey, @Param("uid") int uid);
 
     @Select("select * from orders where flower like concat('%',#{searchKey},'%');")
-    List<Order> findAll(String searchKey);
+    List<Orders> findAll(String searchKey);
 
 
     @Select("select * from orders where fid = #{fid} and uid = #{uid};")
-    Order checkIsAdded(Order order);
+    Orders checkIsAdded(Orders orders);
 
 
     @Update("update orders set state = #{state} where id = #{id};")
-    int changeState(Order order);
+    int changeState(Orders orders);
 
     @Select("select * from orders where uid = #{uid};")
-    List<Order> queryByUid(int uid);
+    List<Orders> queryByUid(int uid);
 
     @Update("update orders set name = #{name},password = #{password},phone = #{phone},address = #{address} where id = #{id};")
-    int update(Order order);
+    int update(Orders orders);
 
     @Delete("delete from orders where id = #{id};")
     int delete(int id);

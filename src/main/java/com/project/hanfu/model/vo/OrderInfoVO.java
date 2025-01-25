@@ -6,13 +6,12 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class CartInfoVO {
+public class OrderInfoVO {
+    @ApiModelProperty("订单id")
+    private Long oid;
 
-    @ApiModelProperty("购物车id")
-    private Long cid;
-
-    @ApiModelProperty("汉服id")
-    private Long hid;
+    @ApiModelProperty("订单guid")
+    private String orderGuid;
 
     @ApiModelProperty("汉服名称")
     private String hanfuName;
@@ -20,12 +19,9 @@ public class CartInfoVO {
     @ApiModelProperty("汉服数量")
     private BigDecimal hanfuQty;
 
-    @ApiModelProperty("汉服价格")
+    @ApiModelProperty("订单价格")
     private BigDecimal price;
 
     @ApiModelProperty("用户id")
     private Long uid;
-
-    @ApiModelProperty("是否删除")
-    private Integer isdelete;
 }

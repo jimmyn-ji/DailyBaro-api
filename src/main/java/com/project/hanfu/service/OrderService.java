@@ -1,7 +1,7 @@
 package com.project.hanfu.service;
 
 import com.project.hanfu.model.Cart;
-import com.project.hanfu.model.Order;
+import com.project.hanfu.model.Orders;
 
 import java.util.List;
 
@@ -15,8 +15,8 @@ public interface OrderService {
 
     int add(Cart cart);
     int delete(int uid);
-    int update(Order order);
-    List<Order> find(String searchKey, String account);
-    List<Order> findAll(String searchKey);
-    List<Order> queryByAccount(String account);
+    int update(Orders orders);
+    List<Orders> find(String searchKey, String account);
+    List<Orders> findAll(String searchKey);
+    List<Orders> queryByAccount(String account);
 }

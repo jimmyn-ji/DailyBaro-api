@@ -5,7 +5,7 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class OrderVo extends Order{
+public class OrdersVo extends Orders {
 
     private String username;
     private String phone;

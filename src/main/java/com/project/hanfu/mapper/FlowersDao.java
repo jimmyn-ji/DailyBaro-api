@@ -12,8 +12,8 @@ public interface FlowersDao {
     @Select("select * from flowers where name like concat('%',#{searchKey},'%');")
     List<Flower> findAll(String searchKey);
 
-    @Select("select price from flowers where id = #{fid};")
-    Float queryPrice(int fid);
+//    @Select("select price from flowers where id = #{fid};")
+//    Float queryPrice(int fid);
 
     @Update("update flowers set name = #{name}, species_name = #{species_name}, price = #{price}, detail = #{detail} where id = #{id};")
     Integer update(Flower flower);

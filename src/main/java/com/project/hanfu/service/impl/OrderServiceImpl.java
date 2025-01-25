@@ -3,7 +3,7 @@ package com.project.hanfu.service.impl;
 import com.project.hanfu.mapper.OrderDao;
 import com.project.hanfu.mapper.UserDao;
 import com.project.hanfu.model.Cart;
-import com.project.hanfu.model.Order;
+import com.project.hanfu.model.Orders;
 import com.project.hanfu.service.OrderService;
 import org.springframework.stereotype.Service;
 
@@ -30,23 +30,23 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public int update(Order order) {
-        return orderdao.update(order);
+    public int update(Orders orders) {
+        return orderdao.update(orders);
     }
 
     @Override
-    public List<Order> find(String searchKey,String account) {
+    public List<Orders> find(String searchKey, String account) {
         Integer uid = userDao.queryIdByAccount(account);
         return orderdao.find(searchKey,uid);
     }
 
     @Override
-    public List<Order> findAll(String searchKey) {
+    public List<Orders> findAll(String searchKey) {
         return orderdao.findAll(searchKey);
     }
 
     @Override
-    public List<Order> queryByAccount(String account) {
+    public List<Orders> queryByAccount(String account) {
         Integer uid = userDao.queryIdByAccount(account);
         return orderdao.queryByUid(uid);
     }
