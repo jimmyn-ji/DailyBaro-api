@@ -67,7 +67,7 @@ public class CartController {
     }
 
     /**
-     * 查询用户购物车
+     * 根据用户账号查询用户购物车
      *
      * @param account 用户账号
      * @return 购物车

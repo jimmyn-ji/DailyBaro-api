@@ -12,10 +12,10 @@ public class Orders {
 
     private int id;
     private String order_guid;
-    private String flower;
+//    private String flower;
     private int amount;
 //    private float price;
-    private float state;
+//    private float state;
 
 
     private Long oid;
@@ -24,6 +24,7 @@ public class Orders {
     private BigDecimal hanfuQty;
     private BigDecimal price;
     private Long uid;
+    private Integer state;
     private Date updateTime;
     private Date createTime;
     private Integer isdelete;

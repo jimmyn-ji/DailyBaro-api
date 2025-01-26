@@ -73,8 +73,8 @@ public class UserController {
      * @return
      */
     @RequestMapping("/update")
-    public ResultData<UserInfoVO> update(@RequestBody UpdateUserInfoDTO updateUserInfoDTO){
-        return userService.update(updateUserInfoDTO);
+    public ResultData<UserInfoVO> updateUserInfo(@RequestBody UpdateUserInfoDTO updateUserInfoDTO){
+        return userService.updateUserInfo(updateUserInfoDTO);
     }
 
 

@@ -9,12 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 /**
  * 用户登录 控制层
- *
- * @author: ShanZhu
- * @date: 2024-01-24
  */
 @RestController
 @RequestMapping("login")
@@ -23,6 +19,11 @@ public class LoginController {
     @Autowired
     private LoginService loginService;
 
+    /**
+     * 登录接口
+     * @param userPwDTO
+     * @return
+     */
     @RequestMapping("/doLogin")
     public ResultData<UserInfoVO> pwLogin(@RequestBody UserPwDTO userPwDTO){
         return loginService.pwLogin(userPwDTO);

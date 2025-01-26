@@ -29,7 +29,7 @@ public interface UserService {
      * @param updateUserInfoDTO
      * @return
      */
-    ResultData<UserInfoVO> update(UpdateUserInfoDTO updateUserInfoDTO);
+    ResultData<UserInfoVO> updateUserInfo(UpdateUserInfoDTO updateUserInfoDTO);
 
     /**
      * 注册用户信息

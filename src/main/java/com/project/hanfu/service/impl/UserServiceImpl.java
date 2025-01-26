@@ -15,6 +15,7 @@ import com.project.hanfu.util.CollectionUtils;
 import com.project.hanfu.util.SnowFlake;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.mapper.util.StringUtil;
 
@@ -47,8 +48,8 @@ public class UserServiceImpl implements UserService {
 
         Example userExample = new Example(User.class);
         userExample.createCriteria().andEqualTo("isdelete")
-                .andEqualTo("account",account)
-                .andEqualTo("role","user");
+                .andEqualTo("account",account);
+//                .andEqualTo("role","user");
         List<User> users = userMapper.selectByExample(userExample);
 
         UserInfoVO userInfoVO = new UserInfoVO();
@@ -70,7 +71,8 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
-    public ResultData<UserInfoVO> update(UpdateUserInfoDTO updateUserInfoDTO) {
+    @Transactional
+    public ResultData<UserInfoVO> updateUserInfo(UpdateUserInfoDTO updateUserInfoDTO) {
         //获取用户id
         Long uid = updateUserInfoDTO.getUid();
         String account = updateUserInfoDTO.getAccount();
@@ -81,7 +83,7 @@ public class UserServiceImpl implements UserService {
 
         //查询用户信息
         Example userExample = new Example(User.class);
-        userExample.createCriteria().andEqualTo("uid",uid);
+        userExample.createCriteria().andEqualTo("account",account);
         List<User> users = userMapper.selectByExample(userExample);
 
         User user = users.get(0);

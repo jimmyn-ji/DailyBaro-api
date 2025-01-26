@@ -1,16 +1,14 @@
-package com.project.hanfu.model.vo;
+package com.project.hanfu.model.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
 import java.math.BigDecimal;
 
 @Data
-public class HanfuInfoVO {
+public class UpdateHanfuInfoDTO {
     @ApiModelProperty("汉服主id")
     private Long hid;
-
-    @ApiModelProperty("汉服种类id")
-    private Long htid;
 
     @ApiModelProperty("汉服名称")
     private String hanfuName;
@@ -24,10 +22,6 @@ public class HanfuInfoVO {
     @ApiModelProperty("汉服详情")
     private String hanfuDetail;
 
-    @ApiModelProperty("汉服图片")
-    private String imgGuid;
-
     @ApiModelProperty("汉服状态")
     private Integer state;
-
 }
