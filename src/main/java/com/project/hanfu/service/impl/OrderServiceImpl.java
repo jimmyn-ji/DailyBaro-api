@@ -198,7 +198,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public ResultData<OrderInfoVO> updateOrderState(UpdateOrderInfoDTO updateOrderInfoDTO) {
         //获取订单id
-00        Long oid = updateOrderInfoDTO.getOid();
+        Long oid = updateOrderInfoDTO.getOid();
         //获取订单状态
         Integer state = updateOrderInfoDTO.getState();
 
