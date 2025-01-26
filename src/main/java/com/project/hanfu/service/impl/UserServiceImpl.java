@@ -1,14 +1,15 @@
 package com.project.hanfu.service.impl;
 
 import com.project.hanfu.exception.CustomException;
-import com.project.hanfu.mapper.UserDao;
 import com.project.hanfu.mapper.UserMapper;
 import com.project.hanfu.model.User;
 import com.project.hanfu.model.dto.AccountDTO;
 import com.project.hanfu.model.dto.InsertUserDTO;
+import com.project.hanfu.model.dto.QueryUserDTO;
 import com.project.hanfu.model.dto.UpdateUserInfoDTO;
 import com.project.hanfu.model.vo.UserInfoVO;
 import com.project.hanfu.result.ResultData;
+import com.project.hanfu.result.ResultQuery;
 import com.project.hanfu.result.ResultUtil;
 import com.project.hanfu.service.UserService;
 import com.project.hanfu.util.CollectionUtils;
@@ -19,14 +20,12 @@ import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.mapper.util.StringUtil;
 
-import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Resource
-    private UserDao userdao;
 
     @Autowired
     private UserMapper userMapper;
@@ -113,6 +112,7 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
+    @Transactional
     public ResultData<UserInfoVO> register(InsertUserDTO insertUserDTO) {
         String account = insertUserDTO.getAccount();
         String password = insertUserDTO.getPassword();
@@ -152,17 +152,41 @@ public class UserServiceImpl implements UserService {
         return ResultUtil.getResultData(userInfoVO);
     }
 
-
+    /**
+     * 管理员查询客户信息
+     * @param queryUserDTO
+     * @return
+     */
     @Override
-    public int delete(int uid) {
-        return userdao.delete(uid);
+    public ResultQuery<UserInfoVO> queryCustomerInfo(QueryUserDTO queryUserDTO) {
+        //获取查询条件
+        String searchKey = queryUserDTO.getSearchKey();
+
+        //查询用户信息
+        Example userExample = new Example(User.class);
+        userExample.createCriteria().andEqualTo("isdelete",0)
+                .andEqualTo("role","user")
+                .andLike("name","%"+searchKey+"%")
+                .andLike("account","%"+searchKey+"%");
+        List<User> users = userMapper.selectByExample(userExample);
+        //若查询结果为空 返回空列表
+        if(CollectionUtils.isEmpty(users)){
+            return ResultUtil.getResultQuery(new ArrayList<>(),0);
+        }
+
+        //若查询结果不为空 返回VOS
+        List<UserInfoVO> userInfoVOS = new ArrayList<>();
+        for(User user : users){
+            UserInfoVO userInfoVO = new UserInfoVO();
+            userInfoVO.setAccount(user.getAccount());
+            userInfoVO.setName(user.getName());
+            userInfoVO.setPhoneNo(user.getPhoneNo());
+            userInfoVO.setAddress(user.getAddress());
+            userInfoVOS.add(userInfoVO);
+        }
+
+        return ResultUtil.getResultQuery(userInfoVOS,users.size());
     }
 
-
-
-    @Override
-    public List<User> find(String searchKey) {
-        return userdao.find(searchKey);
-    }
 
 }

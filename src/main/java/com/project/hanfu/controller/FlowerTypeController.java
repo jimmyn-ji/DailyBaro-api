@@ -1,22 +1,17 @@
 package com.project.hanfu.controller;
 
-import com.project.hanfu.config.HttpMsg;
-import com.project.hanfu.menu.StatusCode;
-import com.project.hanfu.model.dto.HanfuQueryDTO;
+import com.project.hanfu.model.dto.QueryHanfuDTO;
 import com.project.hanfu.model.dto.UpdateHanfuTypeDTO;
 import com.project.hanfu.model.vo.HanfuInfoVO;
 import com.project.hanfu.model.dto.InsertHanfuTypeDTO;
 import com.project.hanfu.model.vo.HanfuTypeVO;
 import com.project.hanfu.result.ResultBase;
-import com.project.hanfu.model.Species;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
-import com.project.hanfu.result.ResultUtil;
 import com.project.hanfu.service.SpeciesService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 
 /**
@@ -32,23 +27,9 @@ public class FlowerTypeController {
     @Resource
     private SpeciesService speciesService;
 
-    /**
-     * 查询所有种类
-     *
-     * @return
-     */
-    @RequestMapping("/findAll")
-    ResultBase findAll() {
-        ResultBase resultBase = new ResultBase();
-        List<Species> all = speciesService.findAll();
-        if (all.size() <= 0) {
-            return resultBase.setCode(StatusCode.ERROR).setMessage(HttpMsg.NO_TYPE_NOW);
-        }
-        return resultBase.setCode(StatusCode.SUCCESS).setData(all);
-    }
 
     /**
-     * 分页查询所有种类
+     * 模糊分页查询所有种类
      *
      * @param page
      * @param searchKey
@@ -57,10 +38,10 @@ public class FlowerTypeController {
     @RequestMapping("/find")
     ResultQuery<HanfuInfoVO> selectAllHanfuType(@RequestParam("page") int page, @RequestParam("searchKey") String searchKey) {
         //从 URL 查询字符串中接收数据并转化为 JSON
-        HanfuQueryDTO hanfuQueryDTO = new HanfuQueryDTO();
-        hanfuQueryDTO.setPage(page);
-        hanfuQueryDTO.setSearchKey(searchKey);
-        return speciesService.selectAllHanfuType(hanfuQueryDTO);
+        QueryHanfuDTO queryHanfuDTO = new QueryHanfuDTO();
+        queryHanfuDTO.setPage(page);
+        queryHanfuDTO.setSearchKey(searchKey);
+        return speciesService.selectAllHanfuType(queryHanfuDTO);
     }
 
 
@@ -75,15 +56,14 @@ public class FlowerTypeController {
     }
 
 
+    /**
+     * 更新汉服种类信息
+     * @param updateHanfuTypeDTO
+     * @return
+     */
     @RequestMapping("/update")
-    ResultBase update(@RequestBody Species species) {
-        ResultBase resultBase = new ResultBase();
-        try {
-            speciesService.update(species);
-            return resultBase.setCode(StatusCode.SUCCESS).setMessage(HttpMsg.UPDATE_TYPE_OK);
-        } catch (Exception e) {
-            return resultBase.setCode(StatusCode.ERROR).setMessage(HttpMsg.UPDATE_TYPE_FAILED);
-        }
+    ResultData<HanfuTypeVO> updateHanfuType(@RequestBody UpdateHanfuTypeDTO updateHanfuTypeDTO) {
+        return speciesService.updateHanfuType(updateHanfuTypeDTO);
     }
 
     /**

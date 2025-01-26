@@ -2,26 +2,21 @@ package com.project.hanfu.controller;
 
 import com.project.hanfu.config.Constant;
 import com.project.hanfu.config.HttpMsg;
-import com.project.hanfu.mapper.FlowersDao;
 import com.project.hanfu.model.Cart;
 import com.project.hanfu.menu.StatusCode;
 import com.project.hanfu.model.dto.AccountDTO;
 import com.project.hanfu.model.dto.CidDTO;
 import com.project.hanfu.model.dto.InsertCartInfoDTO;
-import com.project.hanfu.model.dto.InsertUserDTO;
 import com.project.hanfu.model.vo.CartInfoVO;
 import com.project.hanfu.model.vo.OrderInfoVO;
-import com.project.hanfu.model.vo.UserInfoVO;
 import com.project.hanfu.result.ResultBase;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
 import com.project.hanfu.service.CartService;
 import com.project.hanfu.service.OrderService;
 import org.springframework.web.bind.annotation.*;
-import tk.mybatis.mapper.util.StringUtil;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,8 +35,6 @@ public class CartController {
     @Resource
     private OrderService orderService;
 
-    @Resource
-    private FlowersDao flowersDao;
 
     /**
      * 添加购物车
@@ -102,33 +95,33 @@ public class CartController {
      * @param account   账户
      * @return 购物车列表
      */
-    @RequestMapping("/find")
-    ResultBase find(
-            @RequestParam("page") int page,
-            @RequestParam("searchKey") String searchKey,
-            @RequestParam("account") String account
-    ) {
-
-        ResultBase resultBase = new ResultBase();
-
-        Map<String, Object> map = new HashMap<>();
-        List<Cart> carts = cartService.find(searchKey, account);
-
-        if (carts == null) {
-            return resultBase.setCode(StatusCode.SUCCESS);
-        }
-
-        List<Cart> items = carts.size() >= page * Constant.PAGE_SIZE ?
-                carts.subList((page - 1) * Constant.PAGE_SIZE, page * Constant.PAGE_SIZE)
-                : carts.subList((page - 1) * Constant.PAGE_SIZE, carts.size());
-
-        int len = carts.size() % Constant.PAGE_SIZE == 0 ? carts.size() / Constant.PAGE_SIZE
-                : (carts.size() / Constant.PAGE_SIZE + 1);
-        map.put("items", items);
-        map.put("len", len);
-
-        return resultBase.setCode(StatusCode.SUCCESS).setData(map);
-    }
+//    @RequestMapping("/find")
+//    ResultBase find(
+//            @RequestParam("page") int page,
+//            @RequestParam("searchKey") String searchKey,
+//            @RequestParam("account") String account
+//    ) {
+//
+//        ResultBase resultBase = new ResultBase();
+//
+//        Map<String, Object> map = new HashMap<>();
+//        List<Cart> carts = cartService.find(searchKey, account);
+//
+//        if (carts == null) {
+//            return resultBase.setCode(StatusCode.SUCCESS);
+//        }
+//
+//        List<Cart> items = carts.size() >= page * Constant.PAGE_SIZE ?
+//                carts.subList((page - 1) * Constant.PAGE_SIZE, page * Constant.PAGE_SIZE)
+//                : carts.subList((page - 1) * Constant.PAGE_SIZE, carts.size());
+//
+//        int len = carts.size() % Constant.PAGE_SIZE == 0 ? carts.size() / Constant.PAGE_SIZE
+//                : (carts.size() / Constant.PAGE_SIZE + 1);
+//        map.put("items", items);
+//        map.put("len", len);
+//
+//        return resultBase.setCode(StatusCode.SUCCESS).setData(map);
+//    }
 
 
 
@@ -141,18 +134,18 @@ public class CartController {
      * @param cart 购物车信息
      * @return 结果
      */
-    @RequestMapping("/update")
-    ResultBase update(@RequestBody Cart cart) {
-        ResultBase resultBase = new ResultBase();
-
-        int ans = cartService.update(cart);
-
-        if (ans >= 0) {
-            return resultBase.setCode(StatusCode.SUCCESS).setMessage(HttpMsg.UPDATE_USER_OK);
-        }
-
-        return resultBase.setCode(StatusCode.ERROR).setMessage(HttpMsg.UPDATE_USER_FAILED);
-    }
+//    @RequestMapping("/update")
+//    ResultBase update(@RequestBody Cart cart) {
+//        ResultBase resultBase = new ResultBase();
+//
+//        int ans = cartService.update(cart);
+//
+//        if (ans >= 0) {
+//            return resultBase.setCode(StatusCode.SUCCESS).setMessage(HttpMsg.UPDATE_USER_OK);
+//        }
+//
+//        return resultBase.setCode(StatusCode.ERROR).setMessage(HttpMsg.UPDATE_USER_FAILED);
+//    }
 
 
 

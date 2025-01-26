@@ -19,4 +19,24 @@
     </sql>
 
 
+    <select id="getOrderUserInfoByUids" parameterType="java.util.List" resultMap="BaseResultMap">
+        SELECT
+            o.hanfu_name,
+            o.hanfu_qty,
+            o.price,
+            o.state,
+            u.user_name,
+            u.phone_no,
+            u.address
+        FROM
+            orders o
+                INNER JOIN
+            user u
+            ON
+                o.uid = u.uid
+        WHERE
+            o.uid = #{uid}
+    </select>
+
+
 </mapper>

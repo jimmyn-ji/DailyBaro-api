@@ -1,13 +1,10 @@
 package com.project.hanfu.service.impl;
 
-import com.project.hanfu.config.HttpMsg;
 import com.project.hanfu.exception.CustomException;
-import com.project.hanfu.mapper.FlowersDao;
 import com.project.hanfu.mapper.HanfuMapper;
-import com.project.hanfu.menu.StatusCode;
 import com.project.hanfu.model.Flower;
 import com.project.hanfu.model.Hanfu;
-import com.project.hanfu.model.dto.HanfuQueryDTO;
+import com.project.hanfu.model.dto.QueryHanfuDTO;
 import com.project.hanfu.model.dto.UpdateHanfuImgGuidDTO;
 import com.project.hanfu.model.dto.UpdateHanfuInfoDTO;
 import com.project.hanfu.model.vo.HanfuInfoVO;
@@ -40,26 +37,18 @@ public class FlowersServiceImpl implements FlowersService {
     @Autowired
     private HanfuMapper hanfuMapper;
 
-    @Resource
-    private FlowersDao flowersDao;
-
-    @Override
-    public int add(Flower flower) {
-        return flowersDao.add(flower);
-    }
-
 
 
 
     /**
      * 查询汉服信息
-     * @param hanfuQueryDTO
+     * @param queryHanfuDTO
      * @return
      */
     @Override
-    public ResultQuery<HanfuInfoVO> find(HanfuQueryDTO hanfuQueryDTO) {
-        String searchKey = hanfuQueryDTO.getSearchKey();
-        String searchType = hanfuQueryDTO.getSearchType();
+    public ResultQuery<HanfuInfoVO> find(QueryHanfuDTO queryHanfuDTO) {
+        String searchKey = queryHanfuDTO.getSearchKey();
+        String searchType = queryHanfuDTO.getSearchType();
 
         //获取查询结果 根据汉服名/汉服种类进行模糊查询 且state为1 的数据
         Example hanfuExample = new Example(Hanfu.class);
@@ -84,12 +73,12 @@ public class FlowersServiceImpl implements FlowersService {
 
     /**
      * 管理员查询汉服信息
-     * @param hanfuQueryDTO
+     * @param queryHanfuDTO
      * @return
      */
     @Override
-    public ResultQuery<HanfuInfoVO> selectAllHanfuInfo(HanfuQueryDTO hanfuQueryDTO) {
-        String searchKey = hanfuQueryDTO.getSearchKey();
+    public ResultQuery<HanfuInfoVO> selectAllHanfuInfo(QueryHanfuDTO queryHanfuDTO) {
+        String searchKey = queryHanfuDTO.getSearchKey();
 
         Example hanfuExample = new Example(Hanfu.class);
         hanfuExample.createCriteria().andEqualTo("isdelete",0)

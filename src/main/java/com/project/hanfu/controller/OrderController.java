@@ -3,22 +3,18 @@ package com.project.hanfu.controller;
 import com.project.hanfu.config.Constant;
 import com.project.hanfu.config.HttpMsg;
 import com.project.hanfu.mapper.OrderDao;
-import com.project.hanfu.mapper.UserDao;
 import com.project.hanfu.model.Orders;
 import com.project.hanfu.model.OrdersVo;
 import com.project.hanfu.menu.StatusCode;
 import com.project.hanfu.model.dto.AccountDTO;
-import com.project.hanfu.model.dto.HanfuQueryDTO;
-import com.project.hanfu.model.dto.OrderQueryDTO;
-import com.project.hanfu.model.vo.CartInfoVO;
-import com.project.hanfu.model.vo.HanfuInfoVO;
+import com.project.hanfu.model.dto.QueryOrderDTO;
+import com.project.hanfu.model.dto.UpdateOrderInfoDTO;
 import com.project.hanfu.model.vo.OrderInfoVO;
 import com.project.hanfu.result.ResultBase;
+import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
 import com.project.hanfu.service.OrderService;
-import com.sun.org.apache.xpath.internal.operations.Or;
 import org.springframework.web.bind.annotation.*;
-import tk.mybatis.mapper.util.StringUtil;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -58,49 +54,36 @@ public class OrderController {
     }
 
     /**
-     * 分页查询订单信息
+     * 客户分页查询订单信息
      * @param page
      * @param searchKey
      * @param account
      * @return
      */
     @RequestMapping("/find")
-    ResultQuery<OrderInfoVO> queryOrderInfo(@RequestParam("page") int page, @RequestParam("searchKey") String searchKey, @RequestParam("account") String account) {
+    ResultQuery<OrderInfoVO> queryOrderInfoByUser(@RequestParam("page") int page, @RequestParam("searchKey") String searchKey, @RequestParam("account") String account) {
         //从 URL 查询字符串中接收数据并转化为 JSON
-        OrderQueryDTO orderQueryDTO =new OrderQueryDTO();
-        orderQueryDTO.setPage(page);
-        orderQueryDTO.setSearchKey(searchKey);
-        orderQueryDTO.setAccount(account);
-        return orderService.queryOrderInfo(orderQueryDTO);
+        QueryOrderDTO queryOrderDTO =new QueryOrderDTO();
+        queryOrderDTO.setPage(page);
+        queryOrderDTO.setSearchKey(searchKey);
+        queryOrderDTO.setAccount(account);
+        return orderService.queryOrderInfoByUser(queryOrderDTO);
     }
 
 
+    /**
+     * 管理员分页查询订单信息
+     * @param page
+     * @param searchKey
+     * @return
+     */
     @RequestMapping("/findAll")
-    ResultBase findAll(@RequestParam("page") int page, @RequestParam("searchKey") String searchKey) {
-        ResultBase resultBase = new ResultBase();
-        Map<String, Object> map = new HashMap<>();
-        List<Orders> orders = orderService.findAll(searchKey);
-        if (orders == null) {
-            return resultBase.setCode(StatusCode.SUCCESS);
-        }
-        List<Orders> items = orders.size() >= page * Constant.PAGE_SIZE ?
-                orders.subList((page - 1) * Constant.PAGE_SIZE, page * Constant.PAGE_SIZE)
-                : orders.subList((page - 1) * Constant.PAGE_SIZE, orders.size());
-        int len = orders.size() % Constant.PAGE_SIZE == 0 ? orders.size() / Constant.PAGE_SIZE
-                : (orders.size() / Constant.PAGE_SIZE + 1);
-        List<OrdersVo> vos = new ArrayList<>();
-//        for (Order item : items) {
-//            User user = userDao.queryById(item.getUid());
-//            OrderVo vo = new OrderVo();
-//            vo.setAddress(user.getAddress()).setPhone(user.getPhoneNo()).setUsername(user.getName())
-//                    .setAmount(item.getAmount()).setFlower(item.getFlower()).setId(item.getId())
-//                    .setUid(item.getUid()).setOrder_guid(item.getOrder_guid()).setPrice(item.getPrice())
-//                    .setState(item.getState());
-//            vos.add(vo);
-//        }
-        map.put("items", vos);
-        map.put("len", len);
-        return resultBase.setCode(StatusCode.SUCCESS).setData(map);
+    ResultQuery<OrderInfoVO> queryOrderInfoByAdmin(@RequestParam("page") int page, @RequestParam("searchKey") String searchKey){
+        //从 URL 查询字符串中接收数据并转化为 JSON
+        QueryOrderDTO queryOrderDTO =new QueryOrderDTO();
+        queryOrderDTO.setPage(page);
+        queryOrderDTO.setSearchKey(searchKey);
+        return orderService.queryOrderInfoByAdmin(queryOrderDTO);
     }
 
     @RequestMapping("/update")
@@ -114,9 +97,8 @@ public class OrderController {
     }
 
     @RequestMapping("/changeState")
-    ResultBase changeState(@RequestBody Orders orders) {
-        orderDao.changeState(orders);
-        return new ResultBase().setCode(StatusCode.SUCCESS).setMessage(HttpMsg.UPDATE_ORDER_OK);
+    ResultData<OrderInfoVO> updateOrderState(@RequestBody UpdateOrderInfoDTO updateOrderInfoDTO) {
+        return orderService.updateOrderState(updateOrderInfoDTO);
     }
 
     @DeleteMapping("/delete")

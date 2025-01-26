@@ -3,13 +3,13 @@ package com.project.hanfu.controller;
 import com.project.hanfu.config.Constant;
 import com.project.hanfu.config.HttpMsg;
 import com.project.hanfu.menu.StatusCode;
-import com.project.hanfu.model.dto.AccountDTO;
-import com.project.hanfu.model.dto.InsertUserDTO;
-import com.project.hanfu.model.dto.UpdateUserInfoDTO;
+import com.project.hanfu.model.dto.*;
+import com.project.hanfu.model.vo.HanfuInfoVO;
 import com.project.hanfu.model.vo.UserInfoVO;
 import com.project.hanfu.result.ResultBase;
 import com.project.hanfu.model.User;
 import com.project.hanfu.result.ResultData;
+import com.project.hanfu.result.ResultQuery;
 import com.project.hanfu.service.UserService;
 import org.springframework.web.bind.annotation.*;
 import tk.mybatis.mapper.util.StringUtil;
@@ -38,22 +38,17 @@ public class UserController {
         return userService.queryInfoByAccount(accountDTO);
     }
 
+    /**
+     * 管理员查询客户信息接口
+     * @param page,searchKey
+     * @return
+     */
     @RequestMapping("/find")
-    ResultBase find(@RequestParam("page") int page, @RequestParam("searchKey") String searchKey) {
-        ResultBase resultBase = new ResultBase();
-        Map<String, Object> map = new HashMap<>();
-        List<User> users = userService.find(searchKey);
-        if (users == null) {
-            return resultBase.setCode(StatusCode.SUCCESS);
-        }
-        List<User> items = users.size() >= page * Constant.PAGE_SIZE ?
-                users.subList((page - 1) * Constant.PAGE_SIZE, page * Constant.PAGE_SIZE)
-                : users.subList((page - 1) * Constant.PAGE_SIZE, users.size());
-        int len = users.size() % Constant.PAGE_SIZE == 0 ? users.size() / Constant.PAGE_SIZE
-                : (users.size() / Constant.PAGE_SIZE + 1);
-        map.put("items", items);
-        map.put("len", len);
-        return resultBase.setCode(StatusCode.SUCCESS).setData(map);
+    ResultQuery<UserInfoVO> queryCustomerInfo(@RequestParam("page") int page, @RequestParam("searchKey") String searchKey){
+        QueryUserDTO queryUserDTO = new QueryUserDTO();
+        queryUserDTO.setPage(page);
+        queryUserDTO.setSearchKey(searchKey);
+        return userService.queryCustomerInfo(queryUserDTO);
     }
 
     /**
@@ -66,7 +61,6 @@ public class UserController {
         return userService.register(insertUserDTO);
     }
 
-
     /**
      * 更新用户信息
      * @param updateUserInfoDTO
@@ -75,17 +69,6 @@ public class UserController {
     @RequestMapping("/update")
     public ResultData<UserInfoVO> updateUserInfo(@RequestBody UpdateUserInfoDTO updateUserInfoDTO){
         return userService.updateUserInfo(updateUserInfoDTO);
-    }
-
-
-    @DeleteMapping("/delete")
-    ResultBase delete(@RequestParam("id") int id) {
-        ResultBase resultBase = new ResultBase();
-        int ans = userService.delete(id);
-        if (ans == 1) {
-            return resultBase.setCode(StatusCode.SUCCESS).setMessage(HttpMsg.DELETE_USER_OK);
-        }
-        return resultBase.setCode(StatusCode.ERROR).setMessage(HttpMsg.DELETE_USER_FAILED);
     }
 
 }

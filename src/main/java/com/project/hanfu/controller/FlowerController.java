@@ -3,12 +3,10 @@ package com.project.hanfu.controller;
 import com.project.hanfu.config.HttpMsg;
 import com.project.hanfu.model.Flower;
 import com.project.hanfu.menu.StatusCode;
-import com.project.hanfu.model.dto.HanfuQueryDTO;
+import com.project.hanfu.model.dto.QueryHanfuDTO;
 import com.project.hanfu.model.dto.UpdateHanfuImgGuidDTO;
 import com.project.hanfu.model.dto.UpdateHanfuInfoDTO;
-import com.project.hanfu.model.dto.UpdateUserInfoDTO;
 import com.project.hanfu.model.vo.HanfuInfoVO;
-import com.project.hanfu.model.vo.UserInfoVO;
 import com.project.hanfu.result.ResultBase;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
@@ -26,10 +24,8 @@ import javax.annotation.Resource;
 @RequestMapping("flower")
 public class FlowerController {
 
-
     @Resource
     private FlowersService flowerService;
-
 
     /**
      * 分页查询汉服信息
@@ -41,11 +37,11 @@ public class FlowerController {
     @RequestMapping("/find")
     ResultQuery<HanfuInfoVO> find(@RequestParam("page") int page, @RequestParam("searchKey") String searchKey, @RequestParam("searchType") String searchType) {
         //从 URL 查询字符串中接收数据并转化为 JSON
-        HanfuQueryDTO hanfuQueryDTO = new HanfuQueryDTO();
-        hanfuQueryDTO.setPage(page);
-        hanfuQueryDTO.setSearchKey(searchKey);
-        hanfuQueryDTO.setSearchType(searchType);
-        return flowerService.find(hanfuQueryDTO);
+        QueryHanfuDTO queryHanfuDTO = new QueryHanfuDTO();
+        queryHanfuDTO.setPage(page);
+        queryHanfuDTO.setSearchKey(searchKey);
+        queryHanfuDTO.setSearchType(searchType);
+        return flowerService.find(queryHanfuDTO);
     }
 
     /**
@@ -57,10 +53,10 @@ public class FlowerController {
     @RequestMapping("/findAll")
     ResultQuery<HanfuInfoVO> selectAllHanfuInfo(@RequestParam("page") int page, @RequestParam("searchKey") String searchKey){
         //从 URL 查询字符串中接收数据并转化为 JSON
-        HanfuQueryDTO hanfuQueryDTO = new HanfuQueryDTO();
-        hanfuQueryDTO.setPage(page);
-        hanfuQueryDTO.setSearchKey(searchKey);
-        return flowerService.selectAllHanfuInfo(hanfuQueryDTO);
+        QueryHanfuDTO queryHanfuDTO = new QueryHanfuDTO();
+        queryHanfuDTO.setPage(page);
+        queryHanfuDTO.setSearchKey(searchKey);
+        return flowerService.selectAllHanfuInfo(queryHanfuDTO);
     }
 
     /**
@@ -69,17 +65,17 @@ public class FlowerController {
      * @param flower 商品信息
      * @return 结果
      */
-    @RequestMapping("/create")
-    ResultBase create(@RequestBody Flower flower) {
-        ResultBase resultBase = new ResultBase();
-
-        int ans = flowerService.add(flower);
-        if (ans == 1) {
-            return resultBase.setCode(StatusCode.SUCCESS).setMessage(HttpMsg.ADD_FLOWER_OK);
-        }
-
-        return resultBase.setCode(StatusCode.ERROR).setMessage(HttpMsg.ADD_FLOWER_FAILED);
-    }
+//    @RequestMapping("/create")
+//    ResultBase create(@RequestBody Flower flower) {
+//        ResultBase resultBase = new ResultBase();
+//
+//        int ans = flowerService.add(flower);
+//        if (ans == 1) {
+//            return resultBase.setCode(StatusCode.SUCCESS).setMessage(HttpMsg.ADD_FLOWER_OK);
+//        }
+//
+//        return resultBase.setCode(StatusCode.ERROR).setMessage(HttpMsg.ADD_FLOWER_FAILED);
+//    }
 
 
     /**
@@ -127,6 +123,12 @@ public class FlowerController {
         return flowerService.updateHanfuImgGuid(updateHanfuImgGuidDTO);
     }
 
+
+    /**
+     * 删除汉服信息
+     * @param hid
+     * @return
+     */
     @RequestMapping("/delete")
     ResultData<HanfuInfoVO> deleteHanfuInfo(@RequestParam("id")Long hid){
         UpdateHanfuInfoDTO updateHanfuInfoDTO = new UpdateHanfuInfoDTO();

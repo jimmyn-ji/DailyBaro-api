@@ -2,15 +2,13 @@ package com.project.hanfu.service.impl;
 
 import com.project.hanfu.exception.CustomException;
 import com.project.hanfu.mapper.HanfuTypeMapper;
-import com.project.hanfu.mapper.SpeciesDao;
-import com.project.hanfu.model.Hanfu;
 import com.project.hanfu.model.HanfuType;
-import com.project.hanfu.model.Species;
-import com.project.hanfu.model.dto.HanfuQueryDTO;
+import com.project.hanfu.model.dto.QueryHanfuDTO;
 import com.project.hanfu.model.dto.InsertHanfuTypeDTO;
 import com.project.hanfu.model.dto.UpdateHanfuTypeDTO;
 import com.project.hanfu.model.vo.HanfuInfoVO;
 import com.project.hanfu.model.vo.HanfuTypeVO;
+import com.project.hanfu.result.ResultBase;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
 import com.project.hanfu.result.ResultUtil;
@@ -23,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,22 +28,20 @@ import java.util.stream.Collectors;
 @Service
 public class SpeciesServiceImpl implements SpeciesService {
 
-    @Resource
-    private SpeciesDao speciesDao;
-
     @Autowired
     private HanfuTypeMapper hanfuTypeMapper;
+
     @Autowired
     private SnowFlake snowFlake;
 
     /**
      * 查询所有汉服种类信息
-     * @param hanfuQueryDTO
+     * @param queryHanfuDTO
      * @return
      */
     @Override
-    public ResultQuery<HanfuInfoVO> selectAllHanfuType(HanfuQueryDTO hanfuQueryDTO) {
-        String searchKey = hanfuQueryDTO.getSearchKey();
+    public ResultQuery<HanfuInfoVO> selectAllHanfuType(QueryHanfuDTO queryHanfuDTO) {
+        String searchKey = queryHanfuDTO.getSearchKey();
 
         Example hanfuTypeExample = new Example(HanfuType.class);
         hanfuTypeExample.createCriteria().andEqualTo("isdelete",0)
@@ -75,6 +70,7 @@ public class SpeciesServiceImpl implements SpeciesService {
      * @return
      */
     @Override
+    @Transactional
     public ResultData<HanfuTypeVO> insertHanfuType(InsertHanfuTypeDTO insertHanfuTypeDTO) {
         //获取汉服类型
         String hanfuTypeName = insertHanfuTypeDTO.getHanfuType();
@@ -133,20 +129,40 @@ public class SpeciesServiceImpl implements SpeciesService {
         return ResultUtil.getResultData(hanfuTypeVO);
     }
 
-
-
+    /**
+     * 更新汉服种类信息
+     * @param updateHanfuTypeDTO
+     * @return
+     */
     @Override
-    public int update(Species species) {
-        return speciesDao.update(species);
+    @Transactional
+    public ResultData<HanfuTypeVO> updateHanfuType(UpdateHanfuTypeDTO updateHanfuTypeDTO) {
+        //获取汉服种类id
+        Long htid = updateHanfuTypeDTO.getHtid();
+        //获取汉服类型
+        String hanfuTypeName = updateHanfuTypeDTO.getHanfuType();
+
+        //查询是否存在
+        Example hanfuTypeExample = new Example(HanfuType.class);
+        hanfuTypeExample.createCriteria().andEqualTo("isdelete", 0)
+                .andEqualTo("hanfuType", hanfuTypeName);
+        List<HanfuType> hanfuTypeList = hanfuTypeMapper.selectByExample(hanfuTypeExample);
+
+
+        //如果存在 说明重复
+        if (CollectionUtils.isNotEmpty(hanfuTypeList)) {
+            throw new CustomException("该汉服类型已存在");
+        }
+        //不存在，更新数据
+        HanfuType hanfuType = new HanfuType();
+        hanfuType.setHanfuType(hanfuTypeName);
+        hanfuType.setHtid(htid);
+        hanfuTypeMapper.updateByPrimaryKeySelective(hanfuType);
+
+        //返回VO
+        HanfuTypeVO hanfuTypeVO = new HanfuTypeVO();
+        BeanUtils.copyProperties(hanfuType, hanfuTypeVO);
+        return ResultUtil.getResultData(hanfuTypeVO);
     }
 
-//    @Override
-//    public List<Species> find(String searchKey) {
-//        return speciesDao.find(searchKey);
-//    }
-
-    @Override
-    public List<Species> findAll() {
-        return speciesDao.findAll();
-    }
 }

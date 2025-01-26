@@ -3,9 +3,12 @@ package com.project.hanfu.service;
 import com.project.hanfu.model.User;
 import com.project.hanfu.model.dto.AccountDTO;
 import com.project.hanfu.model.dto.InsertUserDTO;
+import com.project.hanfu.model.dto.QueryUserDTO;
 import com.project.hanfu.model.dto.UpdateUserInfoDTO;
+import com.project.hanfu.model.vo.HanfuInfoVO;
 import com.project.hanfu.model.vo.UserInfoVO;
 import com.project.hanfu.result.ResultData;
+import com.project.hanfu.result.ResultQuery;
 
 import java.util.List;
 
@@ -38,6 +41,11 @@ public interface UserService {
      */
     ResultData<UserInfoVO> register(InsertUserDTO insertUserDTO);
 
-    int delete(int uid);
-    List<User> find(String searchKey);
+    /**
+     * 管理员查询客户信息
+     * @param queryUserDTO
+     * @return
+     */
+    ResultQuery<UserInfoVO> queryCustomerInfo(QueryUserDTO queryUserDTO);
+
 }

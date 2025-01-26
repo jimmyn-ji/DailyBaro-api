@@ -47,7 +47,4 @@ public interface CartService {
      */
     ResultData<OrderInfoVO> checkOut(AccountDTO accountDTO);
 
-    int update(Cart cart);
-    List<Cart> find(String searchKey,String account);
-//    List<Cart> queryByAccount(String account);
 }

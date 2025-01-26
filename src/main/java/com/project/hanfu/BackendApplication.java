@@ -12,7 +12,6 @@ import tk.mybatis.spring.annotation.MapperScan;
  */
 @Slf4j
 @SpringBootApplication
-//@MapperScan("com.project.hanfu.dao")
 @MapperScan("com.project.hanfu.mapper")
 public class BackendApplication {
 

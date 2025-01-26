@@ -1,19 +1,13 @@
 package com.project.hanfu.service;
 
-import com.project.hanfu.model.Flower;
-import com.project.hanfu.model.dto.HanfuQueryDTO;
+import com.project.hanfu.model.dto.QueryHanfuDTO;
 import com.project.hanfu.model.dto.UpdateHanfuImgGuidDTO;
 import com.project.hanfu.model.dto.UpdateHanfuInfoDTO;
-import com.project.hanfu.model.dto.UpdateUserInfoDTO;
 import com.project.hanfu.model.vo.HanfuInfoVO;
-import com.project.hanfu.model.vo.UserInfoVO;
 import com.project.hanfu.result.ResultBase;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 /**
  * 鲜花商品 服务层
@@ -25,18 +19,18 @@ public interface FlowersService {
 
     /**
      * 普通用户查询汉服信息
-     * @param hanfuQueryDTO
+     * @param queryHanfuDTO
      * @return
      */
-    ResultQuery<HanfuInfoVO> find(HanfuQueryDTO hanfuQueryDTO);
+    ResultQuery<HanfuInfoVO> find(QueryHanfuDTO queryHanfuDTO);
 
 
     /**
      * 管理员查询汉服信息
-     * @param hanfuQueryDTO
+     * @param queryHanfuDTO
      * @return
      */
-    ResultQuery<HanfuInfoVO> selectAllHanfuInfo(HanfuQueryDTO hanfuQueryDTO);
+    ResultQuery<HanfuInfoVO> selectAllHanfuInfo(QueryHanfuDTO queryHanfuDTO);
 
     /**
      * 管理员更新汉服信息
@@ -66,8 +60,12 @@ public interface FlowersService {
      */
     ResultBase updateHanfuImgGuid(UpdateHanfuImgGuidDTO updateHanfuImgGuidDTO);
 
+    /**
+     * 管理员删除汉服信息
+     * @param updateHanfuInfoDTO
+     * @return
+     */
     ResultData<HanfuInfoVO> deleteHanfuInfo(UpdateHanfuInfoDTO updateHanfuInfoDTO);
 
-    int add(Flower flower);
 
 }

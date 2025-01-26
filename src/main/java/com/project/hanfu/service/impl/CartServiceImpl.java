@@ -31,8 +31,6 @@ import java.util.List;
 @Service
 public class CartServiceImpl implements CartService {
 
-    @Resource
-    private CartDao cartDao;
 
     @Autowired
     private UserMapper userMapper;
@@ -218,24 +216,6 @@ public class CartServiceImpl implements CartService {
         }
         return ResultUtil.getResultData(orderInfoVO);
     }
-
-
-    @Override
-    public int update(Cart cart) {
-        return cartDao.update(cart);
-    }
-
-    @Override
-    public List<Cart> find(String searchKey, String account) {
-        return cartDao.find(searchKey, account);
-    }
-
-//    @Override
-//    public List<Cart> queryByAccount(String account) {
-//        Integer uid = userDao.queryIdByAccount(account);
-//        return cartDao.queryByUid(uid);
-//    }
-
 
 }
 

@@ -21,8 +21,6 @@ public interface OrderDao {
     Orders checkIsAdded(Orders orders);
 
 
-    @Update("update orders set state = #{state} where id = #{id};")
-    int changeState(Orders orders);
 
     @Select("select * from orders where uid = #{uid};")
     List<Orders> queryByUid(int uid);
