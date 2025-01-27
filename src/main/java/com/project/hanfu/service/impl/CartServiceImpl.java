@@ -76,6 +76,8 @@ public class CartServiceImpl implements CartService {
             cart.setPrice(insertCartInfoDTO.getPrice());
             cart.setUid(uid);
             cartMapper.insertSelective(cart);
+
+            System.out.println("插入后的 cid: " + cart.getCid());
         } else {
             //若存在，更新对应商品数量信息
             cart.setCid(carts.get(0).getCid());
@@ -160,6 +162,12 @@ public class CartServiceImpl implements CartService {
         cartExample.createCriteria().andEqualTo("isdelete", 0)
                 .andEqualTo("cid", cid);
         List<Cart> carts = cartMapper.selectByExample(cartExample);
+
+        //判空
+        if (CollectionUtils.isEmpty(carts)) {
+            throw new CustomException("购物车信息不存在");
+        }
+
 
         Cart cart = carts.get(0);
         cart.setIsdelete(1);

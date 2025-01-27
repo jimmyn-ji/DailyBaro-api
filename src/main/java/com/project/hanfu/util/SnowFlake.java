@@ -3,8 +3,8 @@ package com.project.hanfu.util;
 public class SnowFlake {
     private final long workerId;
     private final long datacenterId;
-    private final long sequence;
-    private final long timestamp;
+    private long sequence = 0L;  // 序列号初始为0
+    private long lastTimestamp = -1L;  // 上次生成ID的时间戳
 
     private final long WORKER_ID_BITS = 5L; // 5位工作机器的ID
     private final long DATACENTER_ID_BITS = 5L; // 5位数据中心的ID
@@ -27,16 +27,40 @@ public class SnowFlake {
         }
         this.workerId = workerId;
         this.datacenterId = datacenterId;
-        this.sequence = 0L; // 初始化序列号为0
-        this.timestamp = System.currentTimeMillis(); // 初始化时间戳
     }
 
     public synchronized long nextId() {
         long currentTimestamp = System.currentTimeMillis();
-        // 生成ID的逻辑...
+
+        if (currentTimestamp < lastTimestamp) {
+            throw new RuntimeException("Clock moved backwards. Refusing to generate id");
+        }
+
+        if (currentTimestamp == lastTimestamp) {
+            // 同一毫秒内，序列号递增
+            sequence = (sequence + 1) & SEQUENCE_MASK;
+            if (sequence == 0) {
+                // 序列号用尽，等待下一毫秒
+                currentTimestamp = tilNextMillis(lastTimestamp);
+            }
+        } else {
+            // 不同毫秒内，序列号置为0
+            sequence = 0L;
+        }
+
+        lastTimestamp = currentTimestamp;
+
         return ((currentTimestamp - EPOCH) << (WORKER_ID_BITS + DATACENTER_ID_BITS + SEQUENCE_BITS))
                 | (datacenterId << (WORKER_ID_BITS + SEQUENCE_BITS))
                 | (workerId << SEQUENCE_BITS)
                 | sequence;
+    }
+
+    private long tilNextMillis(long lastTimestamp) {
+        long timestamp = System.currentTimeMillis();
+        while (timestamp <= lastTimestamp) {
+            timestamp = System.currentTimeMillis();
+        }
+        return timestamp;
     }
 }
