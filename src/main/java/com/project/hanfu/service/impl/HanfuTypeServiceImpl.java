@@ -8,11 +8,10 @@ import com.project.hanfu.model.dto.InsertHanfuTypeDTO;
 import com.project.hanfu.model.dto.UpdateHanfuTypeDTO;
 import com.project.hanfu.model.vo.HanfuInfoVO;
 import com.project.hanfu.model.vo.HanfuTypeVO;
-import com.project.hanfu.result.ResultBase;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
 import com.project.hanfu.result.ResultUtil;
-import com.project.hanfu.service.SpeciesService;
+import com.project.hanfu.service.HanfuTypeService;
 import com.project.hanfu.util.CollectionUtils;
 import com.project.hanfu.util.SnowFlake;
 import org.springframework.beans.BeanUtils;
@@ -26,7 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class SpeciesServiceImpl implements SpeciesService {
+public class HanfuTypeServiceImpl implements HanfuTypeService {
 
     @Autowired
     private HanfuTypeMapper hanfuTypeMapper;

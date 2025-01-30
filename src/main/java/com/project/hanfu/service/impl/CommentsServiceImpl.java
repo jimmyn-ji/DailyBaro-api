@@ -83,6 +83,11 @@ public class CommentsServiceImpl implements CommentsService {
         return ResultUtil.getResultData(commentsInfoVO);
     }
 
+    /**
+     * 查询留言信息
+     * @param queryCommentsDTO
+     * @return
+     */
     @Override
     public ResultQuery<CommentsInfoVO> selectComments(QueryCommentsDTO queryCommentsDTO) {
         //获取模糊查询条件
@@ -117,7 +122,13 @@ public class CommentsServiceImpl implements CommentsService {
         return ResultUtil.getResultQuery(commentsInfoVOList,commentsList.size());
     }
 
+    /**
+     * 回复留言
+     * @param updateCommentsDTO
+     * @return
+     */
     @Override
+    @Transactional
     public ResultData<CommentsInfoVO> replyComments(UpdateCommentsDTO updateCommentsDTO) {
         //获取账号信息
         String account = updateCommentsDTO.getAccount();

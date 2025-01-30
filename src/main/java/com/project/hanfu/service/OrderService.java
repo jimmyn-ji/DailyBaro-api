@@ -4,7 +4,6 @@ import com.project.hanfu.model.dto.*;
 import com.project.hanfu.model.vo.OrderInfoVO;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 /**
@@ -63,13 +62,6 @@ public interface OrderService {
      * @return
      */
     ResultData<OrderInfoVO> createReview(InsertReviewDTO insertReviewDTO);
-
-    /**
-     * 结算购物车信息
-     * @param accountDTO
-     * @return
-     */
-//    ResultData<OrderInfoVO> checkOut(AccountDTO accountDTO);
 
 
 

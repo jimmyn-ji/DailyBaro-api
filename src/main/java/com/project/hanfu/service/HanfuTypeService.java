@@ -5,12 +5,10 @@ import com.project.hanfu.model.dto.InsertHanfuTypeDTO;
 import com.project.hanfu.model.dto.UpdateHanfuTypeDTO;
 import com.project.hanfu.model.vo.HanfuInfoVO;
 import com.project.hanfu.model.vo.HanfuTypeVO;
-import com.project.hanfu.result.ResultBase;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
-import org.springframework.web.bind.annotation.RequestBody;
 
-public interface SpeciesService {
+public interface HanfuTypeService {
 
     /**
      * 查询汉服种类信息

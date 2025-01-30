@@ -7,11 +7,10 @@ import com.project.hanfu.model.vo.HanfuInfoVO;
 import com.project.hanfu.result.ResultBase;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
-import com.project.hanfu.service.FlowersService;
+import com.project.hanfu.service.HanfuService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.annotation.Resource;
 
 
 /**
@@ -19,10 +18,10 @@ import javax.annotation.Resource;
  */
 @RestController
 @RequestMapping("flower")
-public class FlowerController {
+public class HanfuController {
 
-    @Resource
-    private FlowersService flowerService;
+    @Autowired
+    private HanfuService flowerService;
 
     /**
      * 分页查询汉服信息

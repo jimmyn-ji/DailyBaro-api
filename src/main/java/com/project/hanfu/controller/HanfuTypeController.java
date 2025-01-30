@@ -5,14 +5,11 @@ import com.project.hanfu.model.dto.UpdateHanfuTypeDTO;
 import com.project.hanfu.model.vo.HanfuInfoVO;
 import com.project.hanfu.model.dto.InsertHanfuTypeDTO;
 import com.project.hanfu.model.vo.HanfuTypeVO;
-import com.project.hanfu.result.ResultBase;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
-import com.project.hanfu.service.SpeciesService;
+import com.project.hanfu.service.HanfuTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.Resource;
 
 
 /**
@@ -20,10 +17,10 @@ import javax.annotation.Resource;
  */
 @RestController
 @RequestMapping("species")
-public class FlowerTypeController {
+public class HanfuTypeController {
 
     @Autowired
-    private SpeciesService speciesService;
+    private HanfuTypeService hanfuTypeService;
 
 
     /**
@@ -39,7 +36,7 @@ public class FlowerTypeController {
         QueryHanfuDTO queryHanfuDTO = new QueryHanfuDTO();
         queryHanfuDTO.setPage(page);
         queryHanfuDTO.setSearchKey(searchKey);
-        return speciesService.selectAllHanfuType(queryHanfuDTO);
+        return hanfuTypeService.selectAllHanfuType(queryHanfuDTO);
     }
 
 
@@ -50,7 +47,7 @@ public class FlowerTypeController {
      */
     @RequestMapping("/create")
     ResultData<HanfuTypeVO> insertHanfuType(@RequestBody InsertHanfuTypeDTO insertHanfuTypeDTO) {
-        return speciesService.insertHanfuType(insertHanfuTypeDTO);
+        return hanfuTypeService.insertHanfuType(insertHanfuTypeDTO);
     }
 
 
@@ -61,7 +58,7 @@ public class FlowerTypeController {
      */
     @RequestMapping("/update")
     ResultData<HanfuTypeVO> updateHanfuType(@RequestBody UpdateHanfuTypeDTO updateHanfuTypeDTO) {
-        return speciesService.updateHanfuType(updateHanfuTypeDTO);
+        return hanfuTypeService.updateHanfuType(updateHanfuTypeDTO);
     }
 
     /**
@@ -73,7 +70,7 @@ public class FlowerTypeController {
     ResultData<HanfuTypeVO> deleteHanfuType(@RequestParam("htid") Long htid) {
         UpdateHanfuTypeDTO updateHanfuTypeDTO = new UpdateHanfuTypeDTO();
         updateHanfuTypeDTO.setHtid(htid);
-        return speciesService.deleteHanfuType(updateHanfuTypeDTO);
+        return hanfuTypeService.deleteHanfuType(updateHanfuTypeDTO);
     }
 
 }

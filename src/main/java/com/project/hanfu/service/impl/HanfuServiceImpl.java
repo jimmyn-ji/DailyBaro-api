@@ -11,7 +11,7 @@ import com.project.hanfu.result.ResultBase;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
 import com.project.hanfu.result.ResultUtil;
-import com.project.hanfu.service.FlowersService;
+import com.project.hanfu.service.HanfuService;
 import com.project.hanfu.util.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +27,13 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class FlowersServiceImpl implements FlowersService {
+public class HanfuServiceImpl implements HanfuService {
 
     @Value("${uploadPath}")
     private String uploadPath;
 
     @Autowired
     private HanfuMapper hanfuMapper;
-
 
 
 
@@ -201,6 +200,11 @@ public class FlowersServiceImpl implements FlowersService {
         return ResultUtil.getResultBase();
     }
 
+    /**
+     * 删除汉服信息
+     * @param updateHanfuInfoDTO
+     * @return
+     */
     @Override
     public ResultData<HanfuInfoVO> deleteHanfuInfo(UpdateHanfuInfoDTO updateHanfuInfoDTO) {
         //获取汉服id
@@ -220,6 +224,7 @@ public class FlowersServiceImpl implements FlowersService {
         BeanUtils.copyProperties(hanfu,hanfuInfoVO);
         return ResultUtil.getResultData(hanfuInfoVO);
     }
+
 
     private void savePic(InputStream inputStream, String fileName) {
         OutputStream os = null;

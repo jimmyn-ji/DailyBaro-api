@@ -22,6 +22,11 @@ public class LoginServiceImpl implements LoginService {
     @Autowired
     private UserMapper userMapper;
 
+    /**
+     * 登录
+     * @param userPwDTO
+     * @return
+     */
     @Override
     public ResultData<UserInfoVO> pwLogin(UserPwDTO userPwDTO) {
         //验证表单信息

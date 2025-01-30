@@ -180,6 +180,11 @@ public class CartServiceImpl implements CartService {
         return ResultUtil.getResultData(cartInfoVO);
     }
 
+    /**
+     * 购物车结算功能——创建订单
+     * @param accountDTO
+     * @return
+     */
     @Override
     @Transactional
     public ResultData<OrderInfoVO> checkOut(AccountDTO accountDTO) {
@@ -226,6 +231,11 @@ public class CartServiceImpl implements CartService {
         return ResultUtil.getResultData(orderInfoVO);
     }
 
+    /**
+     * 更新购物车信息
+     * @param updateCartInfoDTO
+     * @return
+     */
     @Override
     @Transactional
     public ResultData<CartInfoVO> updateCartInfo(UpdateCartInfoDTO updateCartInfoDTO) {

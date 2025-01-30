@@ -6,10 +6,8 @@ import com.project.hanfu.model.vo.OrderInfoVO;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
 import com.project.hanfu.service.CartService;
-import com.project.hanfu.service.OrderService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.Resource;
 
 
 /**
@@ -19,7 +17,7 @@ import javax.annotation.Resource;
 @RequestMapping("cart")
 public class CartController {
 
-    @Resource
+    @Autowired
     private CartService cartService;
 
 
@@ -74,6 +72,11 @@ public class CartController {
     }
 
 
+    /**
+     * 更新购物车信息
+     * @param updateCartInfoDTO
+     * @return
+     */
     @RequestMapping("/updateCartInfo")
     ResultData<CartInfoVO> updateCartInfo(@RequestBody UpdateCartInfoDTO updateCartInfoDTO){
         return cartService.updateCartInfo(updateCartInfoDTO);

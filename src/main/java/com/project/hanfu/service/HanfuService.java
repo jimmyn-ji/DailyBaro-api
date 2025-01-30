@@ -10,12 +10,9 @@ import com.project.hanfu.result.ResultQuery;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * 鲜花商品 服务层
- *
- * @author: ShanZhu
- * @date: 2024-01-24
+ * 汉服信息 服务层
  */
-public interface FlowersService {
+public interface HanfuService {
 
     /**
      * 普通用户查询汉服信息

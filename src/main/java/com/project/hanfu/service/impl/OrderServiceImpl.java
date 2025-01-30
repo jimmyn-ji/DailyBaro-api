@@ -22,8 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.mapper.util.StringUtil;
 
-import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +43,11 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private SnowFlake snowFlake;
 
+    /**
+     * 删除订单信息
+     * @param deleteOrderDTO
+     * @return
+     */
     @Override
     public ResultData<OrderInfoVO> deleteOrder(DeleteOrderDTO deleteOrderDTO) {
         //获取订单主键
@@ -179,7 +182,6 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 管理员分页查询订单信息
-     *
      * @param queryOrderDTO
      * @return
      */
@@ -258,6 +260,11 @@ public class OrderServiceImpl implements OrderService {
         return ResultUtil.getResultData(orderInfoVO);
     }
 
+    /**
+     * 新增评价信息
+     * @param insertReviewDTO
+     * @return
+     */
     @Override
     public ResultData<OrderInfoVO> createReview(InsertReviewDTO insertReviewDTO) {
         Long uid = insertReviewDTO.getUid();
@@ -287,56 +294,6 @@ public class OrderServiceImpl implements OrderService {
         return ResultUtil.getResultData(orderInfoVO);
     }
 
-    /**
-     * 结算购物车信息
-     * @param accountDTO
-     * @return
-     */
-//    @Override
-//    @Transactional
-//    public ResultData<OrderInfoVO> checkOut(AccountDTO accountDTO) {
-//        //获取用户账号
-//        String account = accountDTO.getAccount();
-//
-//        //根据账号查询用户信息
-//        Example userExample = new Example(User.class);
-//        userExample.createCriteria().andEqualTo("isdelete", 0)
-//                .andEqualTo("account", account)
-//                .andEqualTo("role", "user");
-//        List<User> users = userMapper.selectByExample(userExample);
-//
-//        //获取uid
-//        User user = users.get(0);
-//        Long uid = user.getUid();
-//        //根据用户id查询购物车信息
-//        Example cartExample = new Example(Cart.class);
-//        cartExample.createCriteria().andEqualTo("isdelete", 0)
-//                .andEqualTo("uid", uid);
-//        List<Cart> carts = cartMapper.selectByExample(cartExample);
-//
-//        OrderInfoVO orderInfoVO = new OrderInfoVO();
-//
-//        for (Cart cart : carts) {
-//            //生成订单 将购物车信息插入订单表
-//            Orders insertOrders = new Orders();
-//            insertOrders.setOid(snowFlake.nextId());
-//            insertOrders.setHanfuName(cart.getHanfuName());
-//            insertOrders.setHanfuQty(cart.getHanfuQty());
-//            insertOrders.setPrice(cart.getPrice());
-//            insertOrders.setUid(cart.getUid());
-//            //设置订单状态 0未发货 1已发货
-//            insertOrders.setState(0);
-//            ordersMapper.insertSelective(insertOrders);
-//
-//            //删除购物车信息
-//            cart.setIsdelete(1);
-//            cartMapper.updateByExampleSelective(cart, cartExample);
-//
-//            //返回VO
-//            BeanUtils.copyProperties(insertOrders, orderInfoVO);
-//        }
-//        return ResultUtil.getResultData(orderInfoVO);
-//    }
 
     /**
      * 创建订单

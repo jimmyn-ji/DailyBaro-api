@@ -6,7 +6,6 @@ import com.project.hanfu.model.dto.UpdateCommentsDTO;
 import com.project.hanfu.model.vo.CommentsInfoVO;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
-import org.springframework.web.bind.annotation.RequestBody;
 
 public interface CommentsService {
 

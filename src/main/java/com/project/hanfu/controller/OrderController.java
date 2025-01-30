@@ -5,9 +5,8 @@ import com.project.hanfu.model.vo.OrderInfoVO;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
 import com.project.hanfu.service.OrderService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.Resource;
 
 
 /**
@@ -17,7 +16,7 @@ import javax.annotation.Resource;
 @RequestMapping("order")
 public class OrderController {
 
-    @Resource
+    @Autowired
     private OrderService orderService;
 
     /**
@@ -30,6 +29,11 @@ public class OrderController {
         return orderService.createOrder(createOrderDTO);
     }
 
+    /**
+     * 删除订单
+     * @param oid
+     * @return
+     */
     @RequestMapping("/delete")
     public ResultData<OrderInfoVO> deleteOrder(@RequestParam("oid") Long oid) {
         DeleteOrderDTO deleteOrderDTO=new DeleteOrderDTO();
@@ -102,19 +106,6 @@ public class OrderController {
     public ResultData<OrderInfoVO> createReview(@RequestBody InsertReviewDTO insertReviewDTO) {
         return orderService.createReview(insertReviewDTO);
     }
-    /**
-     * 购物车结算功能
-     * @param account
-     * @return
-     */
-//    @RequestMapping("/create")
-//    ResultData<OrderInfoVO> checkOut(@RequestParam("account") String account){
-//        // 从 URL 查询字符串中接收数据并转化为 JSON
-//        AccountDTO accountDTO=new AccountDTO();
-//        accountDTO.setAccount(account);
-//        return orderService.checkOut(accountDTO);
-//    }
-
 
 
 }
