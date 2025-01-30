@@ -7,6 +7,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="hanfu-backend" />
         <module name="flower-backend" />
       </profile>
     </annotationProcessing>
@@ -15,6 +16,7 @@
     <option name="ADDITIONAL_OPTIONS_STRING" value="-Djps.track.ap.dependencies=true" />
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="flower-backend" options="-parameters" />
+      <module name="hanfu-backend" options="-parameters" />
     </option>
   </component>
 </project>

@@ -4,10 +4,10 @@ import lombok.Data;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
-//@Accessors(chain = true)
 @Table(name = "user")
 public class User {
 
@@ -28,6 +28,10 @@ public class User {
     private Long rid;
 
     private String role;
+
+    private BigDecimal points;
+
+    private Integer isvip;
 
     private Date updateTime;
 

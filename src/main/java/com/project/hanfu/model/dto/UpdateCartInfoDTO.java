@@ -6,7 +6,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class InsertCartInfoDTO {
+public class UpdateCartInfoDTO {
     @ApiModelProperty("购物车id")
     private Long cid;
 
@@ -25,6 +25,5 @@ public class InsertCartInfoDTO {
     @ApiModelProperty("用户id")
     private Long uid;
 
-    @ApiModelProperty("总价")
     private String account;
 }

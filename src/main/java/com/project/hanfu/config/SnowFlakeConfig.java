@@ -9,8 +9,8 @@ public class SnowFlakeConfig {
 
     @Bean
     public SnowFlake snowFlake() {
-        long workerId = 1L; // 你可以根据实际情况设置
-        long datacenterId = 1L; // 你可以根据实际情况设置
+        long workerId = 1L; // 可以根据实际情况设置
+        long datacenterId = 1L; // 可以根据实际情况设置
         return new SnowFlake(workerId, datacenterId);
     }
 }

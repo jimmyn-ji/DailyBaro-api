@@ -28,4 +28,7 @@ public class CartInfoVO {
 
     @ApiModelProperty("是否删除")
     private Integer isdelete;
+
+    @ApiModelProperty("总价")
+    private String amount;
 }

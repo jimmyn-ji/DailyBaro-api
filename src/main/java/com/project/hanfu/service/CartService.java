@@ -1,13 +1,12 @@
 package com.project.hanfu.service;
 
 import com.project.hanfu.model.Cart;
-import com.project.hanfu.model.dto.AccountDTO;
-import com.project.hanfu.model.dto.CidDTO;
-import com.project.hanfu.model.dto.InsertCartInfoDTO;
+import com.project.hanfu.model.dto.*;
 import com.project.hanfu.model.vo.CartInfoVO;
 import com.project.hanfu.model.vo.OrderInfoVO;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
+import com.sun.org.apache.xpath.internal.operations.Or;
 
 import java.util.List;
 
@@ -46,5 +45,12 @@ public interface CartService {
      * @return
      */
     ResultData<OrderInfoVO> checkOut(AccountDTO accountDTO);
+
+    /**
+     * 更新购物车信息
+     * @param updateCartInfoDTO
+     * @return
+     */
+    ResultData<CartInfoVO> updateCartInfo(UpdateCartInfoDTO updateCartInfoDTO);
 
 }

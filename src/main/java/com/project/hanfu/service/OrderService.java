@@ -1,24 +1,30 @@
 package com.project.hanfu.service;
 
-import com.project.hanfu.model.Cart;
-import com.project.hanfu.model.Orders;
-import com.project.hanfu.model.dto.AccountDTO;
-import com.project.hanfu.model.dto.QueryOrderDTO;
-import com.project.hanfu.model.dto.UpdateOrderInfoDTO;
+import com.project.hanfu.model.dto.*;
 import com.project.hanfu.model.vo.OrderInfoVO;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.List;
 
 /**
- * 订单 服务层
- *
- * @author: ShanZhu
- * @date: 2024-01-24
+ * 订单业务层接口
  */
 public interface OrderService {
+
+    /**
+     * 创建订单信息/结算
+     * @param createOrderDTO
+     * @return
+     */
+    ResultData<OrderInfoVO> createOrder(CreateOrderDTO createOrderDTO);
+
+    /**
+     * 删除订单信息
+     * @param deleteOrderDTO
+     * @return
+     */
+    ResultData<OrderInfoVO> deleteOrder(DeleteOrderDTO deleteOrderDTO);
 
     /**
      * 根据账号查询订单信息
@@ -48,12 +54,24 @@ public interface OrderService {
      * @param updateOrderInfoDTO
      * @return
      */
-    ResultData<OrderInfoVO> updateOrderState(@RequestBody UpdateOrderInfoDTO updateOrderInfoDTO);
+    ResultData<OrderInfoVO> updateOrderState(UpdateOrderInfoDTO updateOrderInfoDTO);
 
-    int add(Cart cart);
-    int delete(int uid);
-    int update(Orders orders);
-    List<Orders> find(String searchKey, String account);
-    List<Orders> findAll(String searchKey);
-    List<Orders> queryByAccount(String account);
+
+    /**
+     * 添加评价
+     * @param insertReviewDTO
+     * @return
+     */
+    ResultData<OrderInfoVO> createReview(InsertReviewDTO insertReviewDTO);
+
+    /**
+     * 结算购物车信息
+     * @param accountDTO
+     * @return
+     */
+//    ResultData<OrderInfoVO> checkOut(AccountDTO accountDTO);
+
+
+
+
 }

@@ -1,8 +1,6 @@
 package com.project.hanfu.controller;
 
-import com.project.hanfu.model.dto.AccountDTO;
-import com.project.hanfu.model.dto.CidDTO;
-import com.project.hanfu.model.dto.InsertCartInfoDTO;
+import com.project.hanfu.model.dto.*;
 import com.project.hanfu.model.vo.CartInfoVO;
 import com.project.hanfu.model.vo.OrderInfoVO;
 import com.project.hanfu.result.ResultData;
@@ -41,8 +39,7 @@ public class CartController {
      * @return
      */
     @RequestMapping("/delete")
-    ResultData<CartInfoVO> deleteCartInfo(@RequestParam("cid") Long cid) {
-        System.out.println("接收到的 cid: " + cid);  // 调试输出
+    ResultData<CartInfoVO> deleteCartInfo(@RequestParam("id") Long cid) {
 //        从 URL 查询字符串中接收数据并转化为 JSON
         CidDTO cidDTO= new CidDTO();
         cidDTO.setCid(cid);
@@ -77,6 +74,10 @@ public class CartController {
     }
 
 
+    @RequestMapping("/updateCartInfo")
+    ResultData<CartInfoVO> updateCartInfo(@RequestBody UpdateCartInfoDTO updateCartInfoDTO){
+        return cartService.updateCartInfo(updateCartInfoDTO);
+    }
 
 }
 

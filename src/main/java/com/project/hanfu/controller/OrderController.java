@@ -1,33 +1,17 @@
 package com.project.hanfu.controller;
 
-import com.project.hanfu.config.Constant;
-import com.project.hanfu.config.HttpMsg;
-import com.project.hanfu.mapper.OrderDao;
-import com.project.hanfu.model.Orders;
-import com.project.hanfu.model.OrdersVo;
-import com.project.hanfu.menu.StatusCode;
-import com.project.hanfu.model.dto.AccountDTO;
-import com.project.hanfu.model.dto.QueryOrderDTO;
-import com.project.hanfu.model.dto.UpdateOrderInfoDTO;
+import com.project.hanfu.model.dto.*;
 import com.project.hanfu.model.vo.OrderInfoVO;
-import com.project.hanfu.result.ResultBase;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
 import com.project.hanfu.service.OrderService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 
 /**
- * 订单 控制层
- *
- * @author: ShanZhu
- * @date: 2024-01-24
+ * 订单控制层
  */
 @RestController
 @RequestMapping("order")
@@ -36,9 +20,22 @@ public class OrderController {
     @Resource
     private OrderService orderService;
 
-    @Resource
-    private OrderDao orderDao;
+    /**
+     * 创建订单/结算
+     * @param createOrderDTO
+     * @return
+     */
+    @RequestMapping("/create")
+    public ResultData<OrderInfoVO> createOrder(@RequestBody CreateOrderDTO createOrderDTO) {
+        return orderService.createOrder(createOrderDTO);
+    }
 
+    @RequestMapping("/delete")
+    public ResultData<OrderInfoVO> deleteOrder(@RequestParam("oid") Long oid) {
+        DeleteOrderDTO deleteOrderDTO=new DeleteOrderDTO();
+        deleteOrderDTO.setOid(oid);
+        return orderService.deleteOrder(deleteOrderDTO);
+    }
 
     /**
      * 根据用户账号查询订单信息接口
@@ -86,30 +83,39 @@ public class OrderController {
         return orderService.queryOrderInfoByAdmin(queryOrderDTO);
     }
 
-    @RequestMapping("/update")
-    ResultBase update(@RequestBody Orders orders) {
-        ResultBase resultBase = new ResultBase();
-        int ans = orderService.update(orders);
-        if (ans >= 0) {
-            return resultBase.setCode(StatusCode.SUCCESS).setMessage(HttpMsg.UPDATE_USER_OK);
-        }
-        return resultBase.setCode(StatusCode.ERROR).setMessage(HttpMsg.UPDATE_USER_FAILED);
-    }
-
+    /**
+     * 修改订单状态 0未发货 1已发货
+     * @param updateOrderInfoDTO
+     * @return
+     */
     @RequestMapping("/changeState")
     ResultData<OrderInfoVO> updateOrderState(@RequestBody UpdateOrderInfoDTO updateOrderInfoDTO) {
         return orderService.updateOrderState(updateOrderInfoDTO);
     }
 
-    @DeleteMapping("/delete")
-    ResultBase delete(@RequestParam("id") int id) {
-        ResultBase resultBase = new ResultBase();
-        int ans = orderService.delete(id);
-        if (ans == 1) {
-            return resultBase.setCode(StatusCode.SUCCESS).setMessage(HttpMsg.DELETE_USER_OK);
-        }
-        return resultBase.setCode(StatusCode.ERROR).setMessage(HttpMsg.DELETE_USER_FAILED);
+    /**
+     * 创建评价信息
+     * @param insertReviewDTO
+     * @return
+     */
+    @RequestMapping("/review")
+    public ResultData<OrderInfoVO> createReview(@RequestBody InsertReviewDTO insertReviewDTO) {
+        return orderService.createReview(insertReviewDTO);
     }
+    /**
+     * 购物车结算功能
+     * @param account
+     * @return
+     */
+//    @RequestMapping("/create")
+//    ResultData<OrderInfoVO> checkOut(@RequestParam("account") String account){
+//        // 从 URL 查询字符串中接收数据并转化为 JSON
+//        AccountDTO accountDTO=new AccountDTO();
+//        accountDTO.setAccount(account);
+//        return orderService.checkOut(accountDTO);
+//    }
+
+
 
 }
 

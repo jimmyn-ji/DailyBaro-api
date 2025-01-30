@@ -9,22 +9,20 @@ import com.project.hanfu.result.ResultBase;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
 import com.project.hanfu.service.SpeciesService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
 
 /**
- * 鲜花种类 控制层
- *
- * @author: ShanZhu
- * @date: 2024-01-24
+ * 汉服种类控制层
  */
 @RestController
 @RequestMapping("species")
 public class FlowerTypeController {
 
-    @Resource
+    @Autowired
     private SpeciesService speciesService;
 
 

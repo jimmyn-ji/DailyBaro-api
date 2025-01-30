@@ -10,12 +10,14 @@
         <result column="address" jdbcType="VARCHAR" property="address" />
         <result column="rid" jdbcType="BIGINT" property="rid" />
         <result column="role" jdbcType="VARCHAR" property="role" />
+        <result column="points" jdbcType="DECIMAL" property="points" />
+        <result column="isvip" jdbcType="TINYINT" property="isvip" />
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
         <result column="isdelete" jdbcType="TINYINT" property="isdelete" />
     </resultMap>
     <sql id="Base_Column_List">
-        uid, account, name, password,phone_no, address, rid,role,update_time, create_time,
+        uid, account, name, password,phone_no, address, rid,role,points,isvip,update_time, create_time,
     isdelete
     </sql>
 

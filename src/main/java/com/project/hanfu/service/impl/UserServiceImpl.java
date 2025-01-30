@@ -1,7 +1,9 @@
 package com.project.hanfu.service.impl;
 
 import com.project.hanfu.exception.CustomException;
+import com.project.hanfu.mapper.OrdersMapper;
 import com.project.hanfu.mapper.UserMapper;
+import com.project.hanfu.model.Orders;
 import com.project.hanfu.model.User;
 import com.project.hanfu.model.dto.AccountDTO;
 import com.project.hanfu.model.dto.InsertUserDTO;
@@ -20,8 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.mapper.util.StringUtil;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -31,28 +36,32 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
 
     @Autowired
+    private OrdersMapper ordersMapper;
+
+    @Autowired
     private SnowFlake snowFlake;
 
     /**
      * 根据用户账号查询用户信息
+     *
      * @param accountDTO
      * @return
      */
     @Override
     public ResultData<UserInfoVO> queryInfoByAccount(AccountDTO accountDTO) {
         String account = accountDTO.getAccount();
-        if(StringUtil.isEmpty(account)){
+        if (StringUtil.isEmpty(account)) {
             throw new CustomException("请重新登录");
         }
 
         Example userExample = new Example(User.class);
         userExample.createCriteria().andEqualTo("isdelete")
-                .andEqualTo("account",account);
+                .andEqualTo("account", account);
 //                .andEqualTo("role","user");
         List<User> users = userMapper.selectByExample(userExample);
 
         UserInfoVO userInfoVO = new UserInfoVO();
-        if(CollectionUtils.isNotEmpty(users)){
+        if (CollectionUtils.isNotEmpty(users)) {
             users.forEach(user -> {
                 userInfoVO.setAccount(user.getAccount());
                 userInfoVO.setName(user.getName());
@@ -66,6 +75,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 根据用户id更新用户信息
+     *
      * @param updateUserInfoDTO
      * @return
      */
@@ -82,7 +92,7 @@ public class UserServiceImpl implements UserService {
 
         //查询用户信息
         Example userExample = new Example(User.class);
-        userExample.createCriteria().andEqualTo("account",account);
+        userExample.createCriteria().andEqualTo("account", account);
         List<User> users = userMapper.selectByExample(userExample);
 
         User user = users.get(0);
@@ -108,6 +118,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 用户注册接口
+     *
      * @param insertUserDTO
      * @return
      */
@@ -122,11 +133,11 @@ public class UserServiceImpl implements UserService {
 
         //判断用户账号是否已存在
         Example userExample = new Example(User.class);
-        userExample.createCriteria().andEqualTo("isdelete",0)
-                .andEqualTo("account",account);
+        userExample.createCriteria().andEqualTo("isdelete", 0)
+                .andEqualTo("account", account);
         List<User> users = userMapper.selectByExample(userExample);
         //若存在
-        if(CollectionUtils.isNotEmpty(users)){
+        if (CollectionUtils.isNotEmpty(users)) {
             throw new CustomException("用户账号已存在");
         }
 
@@ -154,6 +165,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 管理员查询客户信息
+     *
      * @param queryUserDTO
      * @return
      */
@@ -164,28 +176,49 @@ public class UserServiceImpl implements UserService {
 
         //查询用户信息
         Example userExample = new Example(User.class);
-        userExample.createCriteria().andEqualTo("isdelete",0)
-                .andEqualTo("role","user")
-                .andLike("name","%"+searchKey+"%")
-                .andLike("account","%"+searchKey+"%");
+        userExample.createCriteria().andEqualTo("isdelete", 0)
+                .andEqualTo("role", "user")
+                .andLike("name", "%" + searchKey + "%")
+                .andLike("account", "%" + searchKey + "%");
         List<User> users = userMapper.selectByExample(userExample);
         //若查询结果为空 返回空列表
-        if(CollectionUtils.isEmpty(users)){
-            return ResultUtil.getResultQuery(new ArrayList<>(),0);
+        if (CollectionUtils.isEmpty(users)) {
+            return ResultUtil.getResultQuery(new ArrayList<>(), 0);
         }
+
+        //获取用户积分信息，判定是否vip
+        Map<Set<Long>, List<Orders>> uidPointsMap = new HashMap<>();
+
+        //查询是否vip用户
+        Example ordersExample = new Example(Orders.class);
+        ordersExample.createCriteria().andEqualTo("isdelete", 0);
+        List<Orders> orders = ordersMapper.selectByExample(ordersExample);
+
+        // 计算每个 uid 的消费总额
+        Map<Long, BigDecimal> uidTotalAmountMap = orders.stream()
+                .collect(Collectors.toMap(
+                        Orders::getUid,
+                        o -> o.getPrice().multiply(o.getHanfuQty()), // 计算 price * qty
+                        BigDecimal::add // 相同 uid 累加
+                ));
+
 
         //若查询结果不为空 返回VOS
         List<UserInfoVO> userInfoVOS = new ArrayList<>();
-        for(User user : users){
+        for (User user : users) {
             UserInfoVO userInfoVO = new UserInfoVO();
             userInfoVO.setAccount(user.getAccount());
             userInfoVO.setName(user.getName());
             userInfoVO.setPhoneNo(user.getPhoneNo());
             userInfoVO.setAddress(user.getAddress());
+            userInfoVO.setPoints(uidTotalAmountMap.getOrDefault(user.getUid(), new BigDecimal(BigInteger.ZERO)));
+            if(userInfoVO.getPoints().compareTo(new BigDecimal(2000)) >= 0){
+                userInfoVO.setIsVip(1);
+            }
             userInfoVOS.add(userInfoVO);
         }
 
-        return ResultUtil.getResultQuery(userInfoVOS,users.size());
+        return ResultUtil.getResultQuery(userInfoVOS, users.size());
     }
 
 

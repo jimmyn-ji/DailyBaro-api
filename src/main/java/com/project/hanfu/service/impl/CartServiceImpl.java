@@ -8,6 +8,7 @@ import com.project.hanfu.model.User;
 import com.project.hanfu.model.dto.AccountDTO;
 import com.project.hanfu.model.dto.CidDTO;
 import com.project.hanfu.model.dto.InsertCartInfoDTO;
+import com.project.hanfu.model.dto.UpdateCartInfoDTO;
 import com.project.hanfu.model.vo.CartInfoVO;
 import com.project.hanfu.model.vo.OrderInfoVO;
 import com.project.hanfu.result.ResultData;
@@ -223,6 +224,44 @@ public class CartServiceImpl implements CartService {
             BeanUtils.copyProperties(insertOrders, orderInfoVO);
         }
         return ResultUtil.getResultData(orderInfoVO);
+    }
+
+    @Override
+    @Transactional
+    public ResultData<CartInfoVO> updateCartInfo(UpdateCartInfoDTO updateCartInfoDTO) {
+        //获取用户id
+        Long uid = updateCartInfoDTO.getUid();
+        //获取购物车单品数量
+        BigDecimal hanfuQty = updateCartInfoDTO.getHanfuQty();
+        //获取购物车id
+        Long cid = updateCartInfoDTO.getCid();
+        //获取汉服id
+        Long hid = updateCartInfoDTO.getHid();
+        //获取汉服价格
+        BigDecimal price = updateCartInfoDTO.getPrice();
+        //获取汉服购买总价
+        String account = updateCartInfoDTO.getAccount();
+        //获取汉服名称
+        String hanfuName = updateCartInfoDTO.getHanfuName();
+
+        Example cartExample = new Example(Cart.class);
+        cartExample.createCriteria().andEqualTo("isdelete", 0)
+                .andEqualTo("uid", uid)
+                .andEqualTo("cid", cid)
+                .andEqualTo("hid", hid);
+        List<Cart> carts = cartMapper.selectByExample(cartExample);
+        if (CollectionUtils.isEmpty(carts)) {
+            throw new CustomException("购物车信息不存在");
+        }
+
+        Cart cart = carts.get(0);
+        cart.setHanfuQty(hanfuQty);
+        cartMapper.updateByExampleSelective(cart, cartExample);
+
+        CartInfoVO cartInfoVO = new CartInfoVO();
+        BeanUtils.copyProperties(cart, cartInfoVO);
+        cartInfoVO.setAmount((cartInfoVO.getHanfuQty().multiply(cartInfoVO.getPrice()).toString()));
+        return ResultUtil.getResultData(cartInfoVO);
     }
 
 }

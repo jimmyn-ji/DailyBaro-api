@@ -2,7 +2,6 @@ package com.project.hanfu.service.impl;
 
 import com.project.hanfu.exception.CustomException;
 import com.project.hanfu.mapper.HanfuMapper;
-import com.project.hanfu.model.Flower;
 import com.project.hanfu.model.Hanfu;
 import com.project.hanfu.model.dto.QueryHanfuDTO;
 import com.project.hanfu.model.dto.UpdateHanfuImgGuidDTO;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import tk.mybatis.mapper.entity.Example;
 
-import javax.annotation.Resource;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,8 +1,5 @@
 package com.project.hanfu.controller;
 
-import com.project.hanfu.config.HttpMsg;
-import com.project.hanfu.model.Flower;
-import com.project.hanfu.menu.StatusCode;
 import com.project.hanfu.model.dto.QueryHanfuDTO;
 import com.project.hanfu.model.dto.UpdateHanfuImgGuidDTO;
 import com.project.hanfu.model.dto.UpdateHanfuInfoDTO;
@@ -59,23 +56,6 @@ public class FlowerController {
         return flowerService.selectAllHanfuInfo(queryHanfuDTO);
     }
 
-    /**
-     * 创建鲜花商品
-     *
-     * @param flower 商品信息
-     * @return 结果
-     */
-//    @RequestMapping("/create")
-//    ResultBase create(@RequestBody Flower flower) {
-//        ResultBase resultBase = new ResultBase();
-//
-//        int ans = flowerService.add(flower);
-//        if (ans == 1) {
-//            return resultBase.setCode(StatusCode.SUCCESS).setMessage(HttpMsg.ADD_FLOWER_OK);
-//        }
-//
-//        return resultBase.setCode(StatusCode.ERROR).setMessage(HttpMsg.ADD_FLOWER_FAILED);
-//    }
 
 
     /**

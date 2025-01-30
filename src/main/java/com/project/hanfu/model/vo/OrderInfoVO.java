@@ -1,7 +1,6 @@
 package com.project.hanfu.model.vo;
 
 import io.swagger.annotations.ApiModelProperty;
-import io.swagger.models.auth.In;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -10,6 +9,15 @@ import java.math.BigDecimal;
 public class OrderInfoVO {
     @ApiModelProperty("订单id")
     private Long oid;
+
+    @ApiModelProperty("购物车id")
+    private Long cid;
+
+    @ApiModelProperty("用户id")
+    private Long uid;
+
+    @ApiModelProperty("汉服id")
+    private Long hid;
 
     @ApiModelProperty("订单guid")
     private String orderGuid;
@@ -23,9 +31,6 @@ public class OrderInfoVO {
     @ApiModelProperty("订单价格")
     private BigDecimal price;
 
-    @ApiModelProperty("用户id")
-    private Long uid;
-
     @ApiModelProperty("用户地址")
     private String address;
 
@@ -35,9 +40,12 @@ public class OrderInfoVO {
     @ApiModelProperty("用户姓名")
     private String userName;
 
-    @ApiModelProperty("汉服id")
-    private Long hid;
-
     @ApiModelProperty("订单状态 0未发货 1已发货")
     private Integer state;
+
+    @ApiModelProperty("评价内容")
+    private String review;
+
+    @ApiModelProperty("是否评价 0未评价 1已评价")
+    private Integer isreview;
 }
