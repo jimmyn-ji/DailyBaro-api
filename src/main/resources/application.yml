@@ -34,4 +34,4 @@ swagger:
       required: false
 
 #图片上传路径 图片所在的路径位置
-uploadPath: /Users/minchi/Desktop/网上鲜花商城/源码/flower-vue/static/imgs/
+uploadPath: /Users/minchi/Desktop/网上汉服商城/源码/hanfu-vue/static/imgs/

@@ -1,5 +1,6 @@
 package com.project.hanfu.service;
 
+import com.project.hanfu.model.dto.InsertHanfuInfoDTO;
 import com.project.hanfu.model.dto.QueryHanfuDTO;
 import com.project.hanfu.model.dto.UpdateHanfuImgGuidDTO;
 import com.project.hanfu.model.dto.UpdateHanfuInfoDTO;
@@ -13,6 +14,13 @@ import org.springframework.web.multipart.MultipartFile;
  * 汉服信息 服务层
  */
 public interface HanfuService {
+
+    /**
+     * 添加汉服信息
+     * @param insertHanfuInfoDTO
+     * @return
+     */
+    ResultData<HanfuInfoVO> insertHanfuInfo(InsertHanfuInfoDTO insertHanfuInfoDTO);
 
     /**
      * 普通用户查询汉服信息

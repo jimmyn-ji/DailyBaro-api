@@ -14,6 +14,7 @@ import com.project.hanfu.result.ResultUtil;
 import com.project.hanfu.service.HanfuTypeService;
 import com.project.hanfu.util.CollectionUtils;
 import com.project.hanfu.util.SnowFlake;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,30 @@ public class HanfuTypeServiceImpl implements HanfuTypeService {
 
     @Autowired
     private SnowFlake snowFlake;
+
+    @Override
+    public ResultData<List<HanfuTypeVO>> selectypeByAdmin(QueryHanfuDTO queryHanfuDTO) {
+
+        Example hanfuExample = new Example(HanfuType.class);
+        hanfuExample.createCriteria().andEqualTo("isdelete",0);
+        List<HanfuType> hanfuTypeList = hanfuTypeMapper.selectByExample(hanfuExample);
+
+        List<HanfuTypeVO> hanfuTypeVOS=new ArrayList<>();
+        //如果查询结果为空
+        if(CollectionUtils.isEmpty(hanfuTypeList)){
+            return ResultUtil.getResultData(hanfuTypeVOS);
+        }
+
+        //若不为空
+        for (HanfuType hanfuType : hanfuTypeList) {
+            HanfuTypeVO hanfuTypeVO = new HanfuTypeVO(); // 每次循环都创建一个新的实例
+            hanfuTypeVO.setHtid(hanfuType.getHtid());
+            hanfuTypeVO.setHanfuType(hanfuType.getHanfuType());
+            hanfuTypeVOS.add(hanfuTypeVO);
+        }
+
+        return ResultUtil.getResultData(hanfuTypeVOS);
+    }
 
     /**
      * 查询所有汉服种类信息

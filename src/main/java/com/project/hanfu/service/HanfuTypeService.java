@@ -7,8 +7,18 @@ import com.project.hanfu.model.vo.HanfuInfoVO;
 import com.project.hanfu.model.vo.HanfuTypeVO;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 public interface HanfuTypeService {
+
+    /**
+     * 管理员查询所有种类
+     * @param queryHanfuDTO
+     * @return
+     */
+    ResultData<List<HanfuTypeVO>> selectypeByAdmin(QueryHanfuDTO queryHanfuDTO);
 
     /**
      * 查询汉服种类信息

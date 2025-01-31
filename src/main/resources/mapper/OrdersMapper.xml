@@ -3,18 +3,22 @@
 <mapper namespace="com.project.hanfu.mapper.OrdersMapper">
     <resultMap id="BaseResultMap" type="com.project.hanfu.model.Orders">
         <id column="oid" jdbcType="BIGINT" property="oid" />
+        <result column="cid" jdbcType="BIGINT" property="cid" />
+        <result column="uid" jdbcType="BIGINT" property="uid" />
+        <result column="hid" jdbcType="BIGINT" property="hid" />
         <result column="order_guid" jdbcType="VARCHAR" property="orderGuid" />
         <result column="hanfu_name" jdbcType="VARCHAR" property="hanfuName" />
         <result column="hanfu_qty" jdbcType="DECIMAL" property="hanfuQty" />
         <result column="price" jdbcType="DECIMAL" property="price" />
         <result column="state" jdbcType="TINYINT" property="state" />
-        <result column="uid" jdbcType="BIGINT" property="uid" />
+        <result column="review" jdbcType="VARCHAR" property="review" />
+        <result column="isreview" jdbcType="TINYINT" property="isreview" />
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
         <result column="isdelete" jdbcType="TINYINT" property="isdelete" />
     </resultMap>
     <sql id="Base_Column_List">
-        oid, order_guid, hanfu_name, hanfu_qty,price, state,uid, update_time, create_time,
+        oid,cid, uid,hid,order_guid, hanfu_name, hanfu_qty,price, state,review,isreview update_time, create_time,
     isdelete
     </sql>
 

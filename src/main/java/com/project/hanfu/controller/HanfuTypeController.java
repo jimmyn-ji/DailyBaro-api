@@ -11,6 +11,8 @@ import com.project.hanfu.service.HanfuTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 /**
  * 汉服种类控制层
@@ -22,6 +24,16 @@ public class HanfuTypeController {
     @Autowired
     private HanfuTypeService hanfuTypeService;
 
+
+    /**
+     * 管理员查询所有种类
+     * @param queryHanfuDTO
+     * @return
+     */
+    @RequestMapping("/findTypebyAdmin")
+    ResultData<List<HanfuTypeVO>> selectypeByAdmin(QueryHanfuDTO queryHanfuDTO) {
+        return hanfuTypeService.selectypeByAdmin(queryHanfuDTO);
+    }
 
     /**
      * 模糊分页查询所有种类

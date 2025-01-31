@@ -3,24 +3,29 @@ package com.project.hanfu.service.impl;
 import com.project.hanfu.exception.CustomException;
 import com.project.hanfu.mapper.HanfuMapper;
 import com.project.hanfu.model.Hanfu;
+import com.project.hanfu.model.dto.InsertHanfuInfoDTO;
 import com.project.hanfu.model.dto.QueryHanfuDTO;
 import com.project.hanfu.model.dto.UpdateHanfuImgGuidDTO;
 import com.project.hanfu.model.dto.UpdateHanfuInfoDTO;
 import com.project.hanfu.model.vo.HanfuInfoVO;
+import com.project.hanfu.model.vo.HanfuTypeVO;
 import com.project.hanfu.result.ResultBase;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
 import com.project.hanfu.result.ResultUtil;
 import com.project.hanfu.service.HanfuService;
 import com.project.hanfu.util.CollectionUtils;
+import com.project.hanfu.util.SnowFlake;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import tk.mybatis.mapper.entity.Example;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -34,8 +39,39 @@ public class HanfuServiceImpl implements HanfuService {
 
     @Autowired
     private HanfuMapper hanfuMapper;
+    @Autowired
+    private SnowFlake snowFlake;
 
 
+
+    @Override
+    @Transactional
+    public ResultData<HanfuInfoVO> insertHanfuInfo(InsertHanfuInfoDTO insertHanfuInfoDTO) {
+        String hanfuName = insertHanfuInfoDTO.getHanfuName();
+        String hanfuType = insertHanfuInfoDTO.getHanfuType();
+        BigDecimal price = insertHanfuInfoDTO.getPrice();
+        String hanfuDetail = insertHanfuInfoDTO.getHanfuDetail();
+
+        Example hanfuExample = new Example(Hanfu.class);
+        hanfuExample.createCriteria().andEqualTo("isdelete",0)
+                .andEqualTo("hanfuName",hanfuName);
+        List<Hanfu> hanfuList = hanfuMapper.selectByExample(hanfuExample);
+        //查重
+        if(CollectionUtils.isNotEmpty(hanfuList)){
+            throw new CustomException("汉服名称重复");
+        }
+
+        //插入数据
+        Hanfu hanfu = new Hanfu();
+        hanfu.setHid(snowFlake.nextId());
+        BeanUtils.copyProperties(insertHanfuInfoDTO,hanfu);
+        hanfuMapper.insertSelective(hanfu);
+
+        HanfuInfoVO hanfuInfoVO = new HanfuInfoVO();
+        BeanUtils.copyProperties(insertHanfuInfoDTO,hanfuInfoVO);
+
+        return ResultUtil.getResultData(hanfuInfoVO);
+    }
 
     /**
      * 查询汉服信息

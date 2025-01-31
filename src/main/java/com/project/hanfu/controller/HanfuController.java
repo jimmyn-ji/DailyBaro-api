@@ -1,5 +1,6 @@
 package com.project.hanfu.controller;
 
+import com.project.hanfu.model.dto.InsertHanfuInfoDTO;
 import com.project.hanfu.model.dto.QueryHanfuDTO;
 import com.project.hanfu.model.dto.UpdateHanfuImgGuidDTO;
 import com.project.hanfu.model.dto.UpdateHanfuInfoDTO;
@@ -21,8 +22,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class HanfuController {
 
     @Autowired
-    private HanfuService flowerService;
+    private HanfuService hanfuService;
 
+    @RequestMapping("/create")
+    public ResultData<HanfuInfoVO> insertHanfuInfo(@RequestBody InsertHanfuInfoDTO insertHanfuInfoDTO){
+        return hanfuService.insertHanfuInfo(insertHanfuInfoDTO);
+    }
+    
     /**
      * 分页查询汉服信息
      * @param page
@@ -37,7 +43,7 @@ public class HanfuController {
         queryHanfuDTO.setPage(page);
         queryHanfuDTO.setSearchKey(searchKey);
         queryHanfuDTO.setSearchType(searchType);
-        return flowerService.find(queryHanfuDTO);
+        return hanfuService.find(queryHanfuDTO);
     }
 
     /**
@@ -52,7 +58,7 @@ public class HanfuController {
         QueryHanfuDTO queryHanfuDTO = new QueryHanfuDTO();
         queryHanfuDTO.setPage(page);
         queryHanfuDTO.setSearchKey(searchKey);
-        return flowerService.selectAllHanfuInfo(queryHanfuDTO);
+        return hanfuService.selectAllHanfuInfo(queryHanfuDTO);
     }
 
 
@@ -64,7 +70,7 @@ public class HanfuController {
      */
     @RequestMapping("/update")
     public ResultData<HanfuInfoVO> updateHanfuInfo(@RequestBody UpdateHanfuInfoDTO updateHanfuInfoDTO){
-        return flowerService.updateHanfuInfo(updateHanfuInfoDTO);
+        return hanfuService.updateHanfuInfo(updateHanfuInfoDTO);
     }
 
 
@@ -75,7 +81,7 @@ public class HanfuController {
      */
     @RequestMapping("/changeState")
     ResultData<HanfuInfoVO> updateHanfuState(@RequestBody UpdateHanfuInfoDTO updateHanfuInfoDTO) {
-        return flowerService.updateHanfuState(updateHanfuInfoDTO);
+        return hanfuService.updateHanfuState(updateHanfuInfoDTO);
     }
 
 
@@ -86,7 +92,7 @@ public class HanfuController {
      */
     @RequestMapping("/updateImg")
     public ResultBase updateHanfuImg(@RequestBody MultipartFile file) {
-        return flowerService.updateHanfuImg(file);
+        return hanfuService.updateHanfuImg(file);
     }
 
     /**
@@ -99,7 +105,7 @@ public class HanfuController {
         UpdateHanfuImgGuidDTO updateHanfuImgGuidDTO = new UpdateHanfuImgGuidDTO();
         updateHanfuImgGuidDTO.setGuid(guid);
         updateHanfuImgGuidDTO.setHid(hid);
-        return flowerService.updateHanfuImgGuid(updateHanfuImgGuidDTO);
+        return hanfuService.updateHanfuImgGuid(updateHanfuImgGuidDTO);
     }
 
 
@@ -112,7 +118,7 @@ public class HanfuController {
     ResultData<HanfuInfoVO> deleteHanfuInfo(@RequestParam("id")Long hid){
         UpdateHanfuInfoDTO updateHanfuInfoDTO = new UpdateHanfuInfoDTO();
         updateHanfuInfoDTO.setHid(hid);
-        return flowerService.deleteHanfuInfo(updateHanfuInfoDTO);
+        return hanfuService.deleteHanfuInfo(updateHanfuInfoDTO);
     }
 }
 

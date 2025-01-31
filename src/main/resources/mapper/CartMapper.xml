@@ -13,8 +13,7 @@
         <result column="isdelete" jdbcType="TINYINT" property="isdelete" />
     </resultMap>
     <sql id="Base_Column_List">
-        cid, hid, hanfu_name, hanfu_qty,price, uid, update_time, create_time,
-    isdelete
+        cid, hid, hanfu_name, hanfu_qty,price, uid, update_time, create_time,isdelete
     </sql>
 
 

@@ -49,6 +49,7 @@ public class OrderServiceImpl implements OrderService {
      * @return
      */
     @Override
+    @Transactional
     public ResultData<OrderInfoVO> deleteOrder(DeleteOrderDTO deleteOrderDTO) {
         //获取订单主键
         Long oid = deleteOrderDTO.getOid();
