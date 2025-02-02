@@ -28,6 +28,10 @@ public class Hanfu {
 
     private Integer state;
 
+    private Integer ispromotion;
+
+    private BigDecimal originalPrice;
+
     private Date createTime;
 
     private Date updateTime;

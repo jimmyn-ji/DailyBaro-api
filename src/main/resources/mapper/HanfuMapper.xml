@@ -9,12 +9,14 @@
         <result column="hanfu_detail" jdbcType="VARCHAR" property="hanfuDetail" />
         <result column="img_guid" jdbcType="VARCHAR" property="imgGuid" />
         <result column="state" jdbcType="TINYINT" property="state" />
+        <result column="ispromotion" jdbcType="TINYINT" property="ispromotion" />
+        <result column="original_price" jdbcType="DECIMAL" property="originalPrice" />
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
         <result column="isdelete" jdbcType="TINYINT" property="isdelete" />
     </resultMap>
     <sql id="Base_Column_List">
-        hid, hanfu_name, hanfu_type, price,hanfu_detail, img_guid, state,update_time, create_time,
+        hid, hanfu_name, hanfu_type, price,hanfu_detail, img_guid, state,ispromotion,original_price,update_time, create_time,
     isdelete
     </sql>
 

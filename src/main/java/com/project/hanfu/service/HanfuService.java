@@ -1,13 +1,12 @@
 package com.project.hanfu.service;
 
-import com.project.hanfu.model.dto.InsertHanfuInfoDTO;
-import com.project.hanfu.model.dto.QueryHanfuDTO;
-import com.project.hanfu.model.dto.UpdateHanfuImgGuidDTO;
-import com.project.hanfu.model.dto.UpdateHanfuInfoDTO;
+import com.project.hanfu.model.dto.*;
+import com.project.hanfu.model.vo.HanfuDetailVO;
 import com.project.hanfu.model.vo.HanfuInfoVO;
 import com.project.hanfu.result.ResultBase;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -30,6 +29,12 @@ public interface HanfuService {
     ResultQuery<HanfuInfoVO> find(QueryHanfuDTO queryHanfuDTO);
 
 
+    /**
+     * 查询汉服详情
+     * @param queryHanfuDetailDTO
+     * @return
+     */
+    ResultData<HanfuDetailVO> selectProductDetail(QueryHanfuDetailDTO queryHanfuDetailDTO);
     /**
      * 管理员查询汉服信息
      * @param queryHanfuDTO

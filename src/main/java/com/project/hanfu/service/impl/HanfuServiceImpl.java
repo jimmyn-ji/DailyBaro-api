@@ -2,11 +2,13 @@ package com.project.hanfu.service.impl;
 
 import com.project.hanfu.exception.CustomException;
 import com.project.hanfu.mapper.HanfuMapper;
+import com.project.hanfu.mapper.OrdersMapper;
+import com.project.hanfu.mapper.UserMapper;
 import com.project.hanfu.model.Hanfu;
-import com.project.hanfu.model.dto.InsertHanfuInfoDTO;
-import com.project.hanfu.model.dto.QueryHanfuDTO;
-import com.project.hanfu.model.dto.UpdateHanfuImgGuidDTO;
-import com.project.hanfu.model.dto.UpdateHanfuInfoDTO;
+import com.project.hanfu.model.Orders;
+import com.project.hanfu.model.User;
+import com.project.hanfu.model.dto.*;
+import com.project.hanfu.model.vo.HanfuDetailVO;
 import com.project.hanfu.model.vo.HanfuInfoVO;
 import com.project.hanfu.model.vo.HanfuTypeVO;
 import com.project.hanfu.result.ResultBase;
@@ -16,6 +18,7 @@ import com.project.hanfu.result.ResultUtil;
 import com.project.hanfu.service.HanfuService;
 import com.project.hanfu.util.CollectionUtils;
 import com.project.hanfu.util.SnowFlake;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,12 +26,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import tk.mybatis.mapper.entity.Example;
+import tk.mybatis.mapper.util.StringUtil;
 
 import java.io.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +41,13 @@ public class HanfuServiceImpl implements HanfuService {
 
     @Autowired
     private HanfuMapper hanfuMapper;
+
+    @Autowired
+    private OrdersMapper ordersMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
     @Autowired
     private SnowFlake snowFlake;
 
@@ -105,6 +114,70 @@ public class HanfuServiceImpl implements HanfuService {
     }
 
     /**
+     * 获取商品评价信息
+     * @param queryHanfuDetailDTO
+     * @return
+     */
+    @Override
+    public ResultData<HanfuDetailVO> selectProductDetail(QueryHanfuDetailDTO queryHanfuDetailDTO) {
+        //获取汉服id
+        Long hid = queryHanfuDetailDTO.getHid();
+
+        //根据id查询汉服信息
+        Example hanfuExample = new Example(Hanfu.class);
+        hanfuExample.createCriteria().andEqualTo("isdelete",0)
+                .andEqualTo("hid",hid);
+        List<Hanfu> hanfuList = hanfuMapper.selectByExample(hanfuExample);
+        if(CollectionUtils.isEmpty(hanfuList)){
+            throw new CustomException("未找到对应汉服信息");
+        }
+
+        Hanfu hanfu = hanfuList.get(0);
+        //查询订单评价信息
+        Example ordersExample = new Example(Orders.class);
+        ordersExample.createCriteria().andEqualTo("isdelete",0)
+                .andEqualTo("hid",hid);
+        List<Orders> ordersList = ordersMapper.selectByExample(ordersExample);
+
+        HanfuDetailVO hanfuDetailVO = new HanfuDetailVO();
+        BeanUtils.copyProperties(hanfu,hanfuDetailVO);
+        //若无订单信息：无评价内容
+        if(CollectionUtils.isEmpty(ordersList)){
+            return ResultUtil.getResultData(hanfuDetailVO);
+        }
+
+        //提取uidSet
+        Set<Long> uidSet = ordersList.stream().map(Orders::getUid).collect(Collectors.toSet());
+
+        //获取用户姓名
+        Example userExample = new Example(User.class);
+        userExample.createCriteria().andEqualTo("isdelete",0)
+                .andIn("uid",uidSet);
+        List<User> userList = userMapper.selectByExample(userExample);
+
+        //将用户信息存入Map
+        Map<Long, String> userMap = userList.stream().collect(Collectors.toMap(User::getUid, User::getName));
+
+        //组装评价信息
+        List<String> reviews = new ArrayList<>();
+        for (Orders orders : ordersList) {
+            String review = orders.getReview();
+            Long uid = orders.getUid();
+
+            //获取用户名
+            String userName = userMap.get(uid);
+            if(StringUtil.isNotEmpty(review)){
+                reviews.add(userName + ":" + review);// 格式：用户名: 评价
+            }
+        }
+        //返回汉服信息
+        hanfuDetailVO.setReviews(reviews);
+        hanfuDetailVO.setImgGuid(hanfu.getImgGuid());
+        return ResultUtil.getResultData(hanfuDetailVO);
+
+    }
+
+    /**
      * 管理员查询汉服信息
      * @param queryHanfuDTO
      * @return
@@ -152,11 +225,16 @@ public class HanfuServiceImpl implements HanfuService {
         hanfu.setHanfuType(updateHanfuInfoDTO.getHanfuType());
         hanfu.setPrice(updateHanfuInfoDTO.getPrice());
         hanfu.setHanfuDetail(updateHanfuInfoDTO.getHanfuDetail());
+        hanfu.setOriginalPrice(updateHanfuInfoDTO.getOriginalPrice());
         hanfuMapper.updateByExampleSelective(hanfu,hanfuExample);
 
         //返回VO
         HanfuInfoVO hanfuInfoVO =new HanfuInfoVO();
         BeanUtils.copyProperties(hanfu,hanfuInfoVO);
+
+        if(StringUtil.isNotEmpty(String.valueOf(updateHanfuInfoDTO.getOriginalPrice()))){
+            hanfuInfoVO.setOriginalPrice(updateHanfuInfoDTO.getOriginalPrice());
+        }
         return ResultUtil.getResultData(hanfuInfoVO);
     }
 

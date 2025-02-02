@@ -22,6 +22,8 @@ public class Promotion {
 
     private String imgGuid;
 
+    private Integer state;
+
     private Date updateTime;
 
     private Date createTime;

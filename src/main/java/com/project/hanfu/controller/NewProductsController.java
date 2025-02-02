@@ -8,9 +8,8 @@ import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
 import com.project.hanfu.service.NewProductsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("new")
@@ -49,14 +48,26 @@ public class NewProductsController {
         return newProductsService.deletePromotion(deletePromotionDTO);
     }
 
+
+
+    /**
+     * 更新促销图片————上传图片
+     * @param file
+     * @return
+     */
+    @RequestMapping("/updateImg")
+    public ResultBase updatePromotionImg(@RequestParam("file") MultipartFile file) {
+        return newProductsService.updatePromotionImg(file);
+    }
+
     /**
      * 更新图片guid
      * @param updatePromotionImgGuidDTO
      * @return
      */
     @RequestMapping("/updateImgGuid")
-    ResultBase updateImgGuid(@RequestBody UpdatePromotionImgGuidDTO updatePromotionImgGuidDTO){
-        return newProductsService.updateImgGuid(updatePromotionImgGuidDTO);
+    public ResultBase updatePromotionImgGuid(@RequestBody UpdatePromotionImgGuidDTO updatePromotionImgGuidDTO){
+        return newProductsService.updatePromotionImgGuid(updatePromotionImgGuidDTO);
     }
 
     /**

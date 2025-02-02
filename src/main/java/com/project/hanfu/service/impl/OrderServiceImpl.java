@@ -267,30 +267,31 @@ public class OrderServiceImpl implements OrderService {
      * @return
      */
     @Override
+    @Transactional
     public ResultData<OrderInfoVO> createReview(InsertReviewDTO insertReviewDTO) {
         Long uid = insertReviewDTO.getUid();
         Long oid = insertReviewDTO.getOid();
         String review = insertReviewDTO.getReview();
         Integer state = insertReviewDTO.getState();
 
-
-        //查询订单表
+        // 查询订单表
         Example orderExample = new Example(Orders.class);
         orderExample.createCriteria().andEqualTo("isdelete", 0)
                 .andEqualTo("oid", oid);
         List<Orders> orders = ordersMapper.selectByExample(orderExample);
         Orders insertOrders = orders.get(0);
 
-        //判断是否已发货
-        if(insertOrders.getState().equals(0)){
+        // 判断是否已发货
+        if (insertOrders.getState().equals(0)) {
             throw new CustomException("该订单还未发货，不能评价");
         }
-        //更新评价内容
+
+        // 更新评价内容
         insertOrders.setReview(review);
         insertOrders.setIsreview(1);
         ordersMapper.updateByExampleSelective(insertOrders, orderExample);
 
-        OrderInfoVO orderInfoVO= new OrderInfoVO();
+        OrderInfoVO orderInfoVO = new OrderInfoVO();
         BeanUtils.copyProperties(insertOrders, orderInfoVO);
         return ResultUtil.getResultData(orderInfoVO);
     }

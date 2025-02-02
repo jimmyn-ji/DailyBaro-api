@@ -1,9 +1,7 @@
 package com.project.hanfu.controller;
 
-import com.project.hanfu.model.dto.InsertHanfuInfoDTO;
-import com.project.hanfu.model.dto.QueryHanfuDTO;
-import com.project.hanfu.model.dto.UpdateHanfuImgGuidDTO;
-import com.project.hanfu.model.dto.UpdateHanfuInfoDTO;
+import com.project.hanfu.model.dto.*;
+import com.project.hanfu.model.vo.HanfuDetailVO;
 import com.project.hanfu.model.vo.HanfuInfoVO;
 import com.project.hanfu.result.ResultBase;
 import com.project.hanfu.result.ResultData;
@@ -46,6 +44,15 @@ public class HanfuController {
         return hanfuService.find(queryHanfuDTO);
     }
 
+    /**
+     * 查询汉服详情
+     * @param queryHanfuDetailDTO
+     * @return
+     */
+    @RequestMapping("/selectProductDetail")
+    ResultData<HanfuDetailVO> selectProductDetail(@RequestBody QueryHanfuDetailDTO queryHanfuDetailDTO) {
+        return hanfuService.selectProductDetail(queryHanfuDetailDTO);
+    }
     /**
      * 管理员查询汉服信息
      * @param page

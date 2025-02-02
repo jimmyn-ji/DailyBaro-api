@@ -24,4 +24,7 @@ public class UpdateHanfuInfoDTO {
 
     @ApiModelProperty("汉服状态")
     private Integer state;
+
+    @ApiModelProperty("促销商品原价")
+    private BigDecimal originalPrice;
 }

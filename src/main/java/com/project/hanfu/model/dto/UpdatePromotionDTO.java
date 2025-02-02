@@ -22,4 +22,7 @@ public class UpdatePromotionDTO{
 
     @ApiModelProperty("促销活动图片")
     private String imgGuid;
+
+    @ApiModelProperty("促销商品状态 0下架 1上架")
+    private Integer state;
 }

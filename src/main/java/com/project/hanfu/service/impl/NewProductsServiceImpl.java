@@ -3,6 +3,7 @@ package com.project.hanfu.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.project.hanfu.exception.CustomException;
+import com.project.hanfu.mapper.HanfuMapper;
 import com.project.hanfu.mapper.PromotionMapper;
 import com.project.hanfu.mapper.PromotionTypeMapper;
 import com.project.hanfu.model.Hanfu;
@@ -20,19 +21,25 @@ import com.project.hanfu.util.CollectionUtils;
 import com.project.hanfu.util.SnowFlake;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import tk.mybatis.mapper.entity.Example;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 public class NewProductsServiceImpl implements NewProductsService {
+
+    @Value("${uploadPath}")
+    private String uploadPath;
+
+    @Autowired
+    private HanfuMapper hanfuMapper;
 
     @Autowired
     private PromotionMapper promotionMapper;
@@ -124,7 +131,8 @@ public class NewProductsServiceImpl implements NewProductsService {
         //判断促销活动名称是否重复
         Example promotionExample = new Example(Promotion.class);
         Example.Criteria criteria = promotionExample.createCriteria().andEqualTo("isdelete", 0)
-                .andEqualTo("promotionName", promotionName);
+                .andEqualTo("promotionName", promotionName)
+                .andEqualTo("promotionDetail",promotionDetail);
         List<Promotion> promotionList = promotionMapper.selectByExample(promotionExample);
 
         // 如果名称存在，再检查名称和 ptid 是否同时存在
@@ -186,28 +194,121 @@ public class NewProductsServiceImpl implements NewProductsService {
         return ResultUtil.getResultData(promotionInfoVO);
     }
 
+
+    @Override
+    public ResultBase updatePromotionImg(MultipartFile file) {
+        //获取文件名
+        String filename = file.getOriginalFilename();
+
+        //只接收 jpg/png 图片 否则报错
+        if (!filename.endsWith(".jpg") && !filename.endsWith(".png")) {
+            throw new CustomException("文件类型错误");
+        }
+
+        String imgGuid = UUID.randomUUID().toString().replaceAll("-", "") + ".jpg";
+
+        try {
+            savePic(file.getInputStream(), imgGuid);
+            return ResultUtil.getResultBase(imgGuid);
+        } catch (IOException e) {
+            throw new CustomException("更新图片失败");
+        }
+    }
+
     @Override
     @Transactional
-    public ResultBase updateImgGuid(UpdatePromotionImgGuidDTO updatePromotionImgGuidDTO) {
+    public ResultBase updatePromotionImgGuid(UpdatePromotionImgGuidDTO updatePromotionImgGuidDTO) {
         String guid = updatePromotionImgGuidDTO.getGuid();
         Long pid = updatePromotionImgGuidDTO.getPid();
 
+        Example promotionExample = new Example(Promotion.class);
+        promotionExample.createCriteria().andEqualTo("isdelete", 0)
+                .andEqualTo("pid", pid);
+        List<Promotion> promotions = promotionMapper.selectByExample(promotionExample);
+        if (promotions.isEmpty()) {
+            throw new CustomException("促销活动不存在");
+        }
+        Promotion promotion = promotions.get(0);
+
+        promotion.setImgGuid(guid);
+        promotionMapper.updateByExampleSelective(promotion, promotionExample);
+
+        return ResultUtil.getResultBase();
+    }
+
+    private void savePic(InputStream inputStream, String fileName) {
+        OutputStream os = null;
+        try {
+            String path = uploadPath; // 修改为你的上传路径
+            // 1K的数据缓冲
+            byte[] bs = new byte[1024];
+            // 读取到的数据长度
+            int len;
+            // 输出的文件流保存到本地文件
+            os = new FileOutputStream(new File(path + fileName));
+            // 开始读取
+            while ((len = inputStream.read(bs)) != -1) {
+                os.write(bs, 0, len);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // 完毕，关闭所有链接
+            try {
+                if (os != null) {
+                    os.close();
+                }
+                inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    @Transactional
+    public ResultData<PromotionInfoVO> changeState(UpdatePromotionDTO updatePromotionDTO) {
+        //获取促销商品id
+        Long pid = updatePromotionDTO.getPid();
+        //获取状态
+        Integer state = updatePromotionDTO.getState();
+
+        //根据id查询促销商品信息
         Example promotionExample = new Example(Promotion.class);
         promotionExample.createCriteria().andEqualTo("isdelete",0)
                 .andEqualTo("pid",pid);
         List<Promotion> promotions = promotionMapper.selectByExample(promotionExample);
         Promotion promotion = promotions.get(0);
 
-        promotion.setImgGuid(guid);
+        //更新促销商品信息
+        promotion.setState(state);
         promotionMapper.updateByExampleSelective(promotion,promotionExample);
 
-        return ResultUtil.getResultBase();
-    }
 
-    @Override
-    @Transactional
-    public ResultData<PromotionInfoVO> changeState(UpdatePromotionDTO updatePromotionDTO) {
-        return null;
+        //获取促销类型名称
+        Long ptid = promotion.getPtid();
+        Example promotionTypeExample = new Example(PromotionType.class);
+        promotionTypeExample.createCriteria().andEqualTo("isdelete",0)
+                .andEqualTo("ptid",ptid);
+        List<PromotionType> promotionTypeList = promotionTypeMapper.selectByExample(promotionTypeExample);
+        Map<Long, PromotionType> promotionTypeMap = promotionTypeList.stream().collect(Collectors.toMap(PromotionType::getPtid, Function.identity()));
+
+        //更新汉服展示信息 插入数据库
+        Hanfu hanfu = new Hanfu();
+        hanfu.setHid(snowFlake.nextId());
+        hanfu.setImgGuid(promotion.getImgGuid());
+        hanfu.setHanfuName(promotion.getPromotionName());
+        hanfu.setHanfuType(promotionTypeMap.get(ptid).getPromotionType());
+        hanfu.setState(state);
+        hanfu.setIspromotion(1);
+        hanfu.setHanfuDetail(promotion.getPromotionDetail());
+        hanfuMapper.insertSelective(hanfu);
+
+        //返回VO
+        PromotionInfoVO promotionInfoVO = new PromotionInfoVO();
+        BeanUtils.copyProperties(promotion,promotionInfoVO);
+        promotionInfoVO.setPid(promotion.getPid());
+        return ResultUtil.getResultData(promotionInfoVO);
     }
 
     @Override

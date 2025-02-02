@@ -7,6 +7,8 @@ import com.project.hanfu.model.vo.PromotionTypeInfoVO;
 import com.project.hanfu.result.ResultBase;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface NewProductsService {
 
@@ -33,8 +35,26 @@ public interface NewProductsService {
      */
     ResultData<PromotionInfoVO> deletePromotion(DeletePromotionDTO deletePromotionDTO);
 
-    ResultBase updateImgGuid(UpdatePromotionImgGuidDTO updatePromotionImgGuidDTO);
+    /**
+     * 上传图片
+     * @param file
+     * @return
+     */
+    ResultBase updatePromotionImg(MultipartFile file);
 
+    /**
+     * 更新图片Guid
+     * @param updatePromotionImgGuidDTO
+     * @return
+     */
+    ResultBase updatePromotionImgGuid(UpdatePromotionImgGuidDTO updatePromotionImgGuidDTO);
+
+
+    /**
+     * 更新状态 0下架 1上架
+     * @param updatePromotionDTO
+     * @return
+     */
     ResultData<PromotionInfoVO> changeState(UpdatePromotionDTO updatePromotionDTO);
 
     /**

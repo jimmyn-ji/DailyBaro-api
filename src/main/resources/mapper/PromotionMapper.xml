@@ -7,12 +7,13 @@
         <result column="promotion_name" jdbcType="VARCHAR" property="promotionName" />
         <result column="promotion_detail" jdbcType="VARCHAR" property="promotionDetail" />
         <result column="img_guid" jdbcType="VARCHAR" property="imgGuid" />
+        <result column="state" jdbcType="TINYINT" property="state" />
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
         <result column="isdelete" jdbcType="TINYINT" property="isdelete" />
     </resultMap>
     <sql id="Base_Column_List">
-        pid, promotion_name,ptid,promotion_detail,img_guid, update_time, create_time,isdelete
+        pid, promotion_name,ptid,promotion_detail,img_guid,state, update_time, create_time,isdelete
     </sql>
 
 
