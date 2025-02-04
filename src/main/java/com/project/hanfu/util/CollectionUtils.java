@@ -18,12 +18,4 @@ public class CollectionUtils {
     public static boolean isEmpty(Map map) {
         return (map == null || map.isEmpty() || map.size() == 0);
     }
-
-    public static boolean isNotEmpty(Map map) {
-        return !isEmpty(map);
-    }
-
-    public static <T> List findAll(Collection collection, Predicate<T> predicate) {
-        return collection == null ? null : (List) collection.stream().filter(predicate).collect(Collectors.toList());
-    }
 }

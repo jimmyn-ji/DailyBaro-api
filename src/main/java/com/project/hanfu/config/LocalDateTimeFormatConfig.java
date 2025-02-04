@@ -87,35 +87,12 @@ public class LocalDateTimeFormatConfig {
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         //LocalDateTime系列序列化和反序列化模块
         JavaTimeModule javaTimeModule = new JavaTimeModule();
-        //javaTimeModule.addSerializer(LocalDateTime.class,new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT)));
-        //javaTimeModule.addSerializer(LocalDate.class,new LocalDateSerializer(DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT)));
         javaTimeModule.addSerializer(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ofPattern(DEFAULT_TIME_FORMAT)));
         javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT)));
         javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT)));
         javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern(DEFAULT_TIME_FORMAT)));
 
 
-        //Date序列化和反序列化
-/*        javaTimeModule.addSerializer(Date.class, new JsonSerializer<Date>() {
-            @Override
-            public void serialize(Date date, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-                SimpleDateFormat formatter = new SimpleDateFormat(DEFAULT_DATE_TIME_FORMAT);
-                String formattedDate = formatter.format(date);
-                jsonGenerator.writeString(formattedDate);
-            }
-        });
-        javaTimeModule.addDeserializer(Date.class, new JsonDeserializer<Date>() {
-            @Override
-            public Date deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
-                SimpleDateFormat format = new SimpleDateFormat(DEFAULT_DATE_TIME_FORMAT);
-                String date = jsonParser.getText();
-                try {
-                    return format.parse(date);
-                } catch (ParseException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });*/
         javaTimeModule.addSerializer(
                 LocalDateTime.class,
                 new JsonSerializer<LocalDateTime>() {

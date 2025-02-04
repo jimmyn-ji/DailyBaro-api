@@ -20,19 +20,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-/**
- * 〈一句话功能简述〉<br>
- * 〈〉
- *
- * @author HIAPAD
- * @create 2020/3/10
- * @since 1.0.0
- */
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
-
-
     @ExceptionHandler({Exception.class})
     @ResponseBody
     public ResultBase handleBindExceptionException(Exception ex) {

@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 
 /**
  * 执行结果
- * @param <T>
  */
 @ApiModel(value = "查询结果", parent = ResultBase.class)
 public class ResultData<T> extends ResultBase {

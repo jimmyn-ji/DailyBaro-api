@@ -7,7 +7,6 @@ import com.project.hanfu.model.vo.PromotionTypeInfoVO;
 import com.project.hanfu.result.ResultBase;
 import com.project.hanfu.result.ResultData;
 import com.project.hanfu.result.ResultQuery;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface NewProductsService {

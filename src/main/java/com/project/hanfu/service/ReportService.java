@@ -4,7 +4,6 @@ import com.project.hanfu.model.dto.QueryReportDTO;
 import com.project.hanfu.model.vo.ReportByHanfuTypeInfoVO;
 import com.project.hanfu.model.vo.ReportInfoVO;
 import com.project.hanfu.result.ResultData;
-import org.springframework.web.bind.annotation.RequestBody;
 
 public interface ReportService {
 

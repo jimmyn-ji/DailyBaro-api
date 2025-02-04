@@ -27,10 +27,8 @@ import java.util.List;
 @ConditionalOnProperty(prefix = "swagger",name = "open",havingValue = "true")
 public class SwaggerConfig {
 
-
-    //"com.lightmes.production.controller"
     private String basePackage;
-    //
+
     private String title;
 
     private String description;
@@ -51,13 +49,8 @@ public class SwaggerConfig {
     private List<Parameter> getParameters() {
         //添加参数选项
         ParameterBuilder tokenPar = new ParameterBuilder();
-        //ParameterBuilder versionPar = new ParameterBuilder();
         List<Parameter> pars = new ArrayList<>();
-        //版本号参数
-        //versionPar.name("version").description("版本号").modelRef(new ModelRef("string")).parameterType("header").required(false).build();
-        //在请求头中设置token参数
         tokenPar.name("token").description("令牌").modelRef(new ModelRef("string")).parameterType("header").required(false).build();
-        //pars.add(versionPar.build());
         pars.add(tokenPar.build());
         return pars;
     }
@@ -69,17 +62,11 @@ public class SwaggerConfig {
                 //页面标题
                 .title(title)
                 //创建人
-                .contact(new Contact("Bevan", null, ""))
+                .contact(new Contact("J", null, ""))
                 //版本号
                 .version("1.0")
                 //描述
                 .description(description)
                 .build();
     }
-
-
-
-
-
-
 }

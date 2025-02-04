@@ -10,8 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * 请求处理拦截器
  *
- * @author: ShanZhu
- * @date: 2024-01-24
  */
 @Component
 public class ProcessInterceptor implements HandlerInterceptor {
