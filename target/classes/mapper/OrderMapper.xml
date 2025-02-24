@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.transactions.mapper.OrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.project.transactions.model.Order">
+        <id column="oid" jdbcType="BIGINT" property="oid" />
+        <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
+        <result column="uid" jdbcType="BIGINT" property="uid" />
+        <result column="pid" jdbcType="BIGINT" property="pid" />
+        <result column="price" jdbcType="DECIMAL" property="price" />
+        <result column="total_amount" jdbcType="DECIMAL" property="totalAmount" />
+        <result column="payment_method" jdbcType="Integer" property="paymentMethod" />
+        <result column="status" jdbcType="INTEGER" property="status" />
+        <result column="is_comment" jdbcType="INTEGER" property="isComment" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="isdelete" jdbcType="INTEGER" property="isdelete" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        oid, order_no, uid, pid, price, total_amount, payment_method, status, is_comment, create_time, update_time, isdelete
+    </sql>
+</mapper>
