@@ -1,25 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.project.hanfu.mapper.UserMapper">
-    <resultMap id="BaseResultMap" type="com.project.hanfu.model.User">
+<mapper namespace="com.project.transactions.mapper.UserMapper">
+    <resultMap id="BaseResultMap" type="com.project.transactions.model.User">
         <id column="uid" jdbcType="BIGINT" property="uid" />
         <result column="account" jdbcType="VARCHAR" property="account" />
-        <result column="name" jdbcType="VARCHAR" property="name" />
         <result column="password" jdbcType="VARCHAR" property="password" />
-        <result column="phone_no" jdbcType="VARCHAR" property="phoneNo" />
+        <result column="phone" jdbcType="VARCHAR" property="phone" />
+        <result column="email" jdbcType="VARCHAR" property="email" />
+        <result column="role" jdbcType="INTEGER" property="role" />
+        <result column="status" jdbcType="INTEGER" property="status" />
         <result column="address" jdbcType="VARCHAR" property="address" />
-        <result column="rid" jdbcType="BIGINT" property="rid" />
-        <result column="role" jdbcType="VARCHAR" property="role" />
-        <result column="points" jdbcType="DECIMAL" property="points" />
-        <result column="isvip" jdbcType="TINYINT" property="isvip" />
-        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-        <result column="isdelete" jdbcType="TINYINT" property="isdelete" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="isdelete" jdbcType="INTEGER" property="isdelete" />
     </resultMap>
+
     <sql id="Base_Column_List">
-        uid, account, name, password,phone_no, address, rid,role,points,isvip,update_time, create_time,
-    isdelete
+        uid, account, password, phone, email, role, status, address, create_time, update_time, isdelete
     </sql>
-
-
 </mapper>

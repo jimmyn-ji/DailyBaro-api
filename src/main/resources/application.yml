@@ -1,37 +1,36 @@
-#后端服务端口
 server:
   port: 8081
 
 spring:
-  #数据库配置
   datasource:
-    url: jdbc:mysql://localhost:3306/hanfu_db?characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3306/secondhand_transactions?characterEncoding=UTF-8
     username: root
     password: 123456
-  resources:
-    chain:
-      strategy:
-        content:
-          enabled: true
-          paths: /**
-  jackson:
-    time-zone: Asia/Shanghai
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 2MB
+  mvc:
+    static-path-pattern: /upload/**
+  web:
+    resources:
+      static-locations:
+        - "classpath:/META-INF/resources/"
+        - "classpath:/resources/"
+        - "classpath:/static/"
+        - "classpath:/public/"
+        - "file:${file.upload-dir}"
 
 mybatis:
-  type-aliases-package: com.project.hanfu.model
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.project.transactions.model
 
-swagger:
-  open: true
-  basePackage: com.project.hanfu.controller
-  version: 1.0.0
-  description: 汉服接口文档
-  title: 汉服接口文档
-  parameters:
-    token:
-      name: token
-      modelRef: string
-      parameterType: header
-      required: false
+logging:
+  level:
+    com.project.transactions: debug
 
-#图片上传路径 图片所在的路径位置
-uploadPath: /Users/minchi/Desktop/网上汉服商城/源码/hanfu-vue/static/imgs/
+# 文件上传配置
+file:
+  upload-dir: uploads
+
+# 上传文件大小限制
