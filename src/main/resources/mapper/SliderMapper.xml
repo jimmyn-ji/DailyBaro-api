@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.mapper.SliderMapper">
+
+    <resultMap id="BaseResultMap" type="com.project.model.Slider">
+        <id column="slider_id" jdbcType="BIGINT" property="sliderId"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="image_url" jdbcType="VARCHAR" property="imageUrl"/>
+        <result column="is_deleted" jdbcType="TINYINT" property="isdeleted"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        slider_id, title, image_url, is_deleted
+    </sql>
+
+    <!-- 查询所有轮播图 -->
+    <select id="selectAllSliders" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM slider
+        WHERE is_deleted = 0
+    </select>
+
+    <!-- 根据ID查询轮播图 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM slider
+        WHERE slider_id = #{sliderId} AND is_deleted = 0
+    </select>
+
+    <!-- 插入新轮播图 -->
+    <insert id="insertSlider" parameterType="com.project.model.Slider" useGeneratedKeys="true" keyProperty="sliderId">
+        INSERT INTO slider (title, image_url, is_deleted)
+        VALUES (#{title}, #{imageUrl}, 0)
+    </insert>
+
+    <!-- 更新轮播图信息 -->
+    <update id="updateSlider" parameterType="com.project.model.Slider">
+        UPDATE slider
+        SET title = #{title},
+            image_url = #{imageUrl}
+        WHERE slider_id = #{sliderId}
+    </update>
+
+    <!-- 删除轮播图 -->
+    <update id="deleteSlider" parameterType="Long">
+        UPDATE slider SET is_deleted = 1 WHERE slider_id = #{sliderId}
+    </update>
+</mapper>

@@ -1,22 +1,173 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.project.transactions.mapper.OrderMapper">
+<mapper namespace="com.project.mapper.OrderMapper">
 
-    <resultMap id="BaseResultMap" type="com.project.transactions.model.Order">
-        <id column="oid" jdbcType="BIGINT" property="oid" />
-        <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
-        <result column="uid" jdbcType="BIGINT" property="uid" />
-        <result column="pid" jdbcType="BIGINT" property="pid" />
-        <result column="price" jdbcType="DECIMAL" property="price" />
-        <result column="total_amount" jdbcType="DECIMAL" property="totalAmount" />
-        <result column="payment_method" jdbcType="Integer" property="paymentMethod" />
-        <result column="status" jdbcType="INTEGER" property="status" />
-        <result column="is_comment" jdbcType="INTEGER" property="isComment" />
-        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-        <result column="isdelete" jdbcType="INTEGER" property="isdelete" />
+    <!-- 映射实体类字段 -->
+    <resultMap id="BaseResultMap" type="com.project.model.Order">
+        <id column="order_id" jdbcType="BIGINT" property="orderId"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="order_amount" jdbcType="DECIMAL" property="orderAmount"/>
+        <result column="order_status" jdbcType="VARCHAR" property="orderStatus"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="pay_time" jdbcType="TIMESTAMP" property="payTime"/>
+        <result column="is_paid" jdbcType="TINYINT" property="isPaid"/>
+        <result column="is_cancelled" jdbcType="TINYINT" property="isCancelled"/>
     </resultMap>
+
+    <!-- 字段列表 -->
     <sql id="Base_Column_List">
-        oid, order_no, uid, pid, price, total_amount, payment_method, status, is_comment, create_time, update_time, isdelete
+        order_id, user_id, order_amount, order_status, create_time, pay_time, is_paid, is_cancelled
     </sql>
+
+    <!-- 创建订单 -->
+    <insert id="createOrder" parameterType="com.project.model.Order" useGeneratedKeys="true" keyProperty="orderId">
+        INSERT INTO orders
+        (user_id, order_amount, order_status, create_time, pay_time, is_paid, is_cancelled)
+        VALUES
+            (#{userId}, #{orderAmount}, #{orderStatus}, #{createTime}, #{payTime}, 0, 0)
+    </insert>
+
+    <!-- 根据订单ID获取订单 -->
+    <select id="getOrderById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM orders
+        WHERE order_id = #{orderId}
+    </select>
+
+    <!-- 订单及其关联商品信息的结果映射 -->
+    <resultMap id="OrderWithProResultMap" type="com.project.model.vo.OrderOneVO">
+        <id column="order_id" jdbcType="BIGINT" property="orderId"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="order_amount" jdbcType="DECIMAL" property="orderAmount"/>
+        <result column="order_status" jdbcType="VARCHAR" property="orderStatus"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="pay_time" jdbcType="TIMESTAMP" property="payTime"/>
+        <result column="is_paid" jdbcType="TINYINT" property="isPaid"/>
+        <result column="is_cancelled" jdbcType="TINYINT" property="isCancelled"/>
+        <collection property="products" ofType="com.project.model.Product">
+            <id column="product_id" jdbcType="BIGINT" property="productId"/>
+            <result column="product_name" jdbcType="VARCHAR" property="name"/>
+            <result column="product_description" jdbcType="VARCHAR" property="description"/>
+            <result column="product_price" jdbcType="DOUBLE" property="price"/>
+            <result column="product_image_url" jdbcType="VARCHAR" property="imageUrl"/>
+            <result column="product_stock" jdbcType="INTEGER" property="stock"/>
+            <result column="quantity" jdbcType="INTEGER" property="quantity"/>
+        </collection>
+    </resultMap>
+
+
+    <!-- 根据订单ID查询订单及其关联商品信息 -->
+    <select id="getOrderByOid" resultMap="OrderWithProResultMap">
+        SELECT
+            o.order_id,
+            o.user_id,
+            o.order_amount,
+            o.order_status,
+            o.create_time,
+            o.pay_time,
+            o.is_paid,
+            o.is_cancelled,
+            sp.id as product_id,
+            sp.name as product_name,
+            sp.description as product_description,
+            sp.price as product_price,
+            sp.image_url as product_image_url,
+            sp.stock as product_stock,
+            sc.quantity
+        FROM
+            orders o
+                JOIN
+            shopping_cart sc ON o.order_id = sc.order_id
+                JOIN
+            nursing_product sp ON sc.product_id = sp.id
+        WHERE
+            o.order_id = #{orderId}
+    </select>
+
+    <!-- 更新订单 -->
+    <update id="updateOrder" parameterType="com.project.model.Order">
+        UPDATE orders
+        SET user_id = #{userId},
+            order_amount = #{orderAmount},
+            order_status = #{orderStatus},
+            create_time = #{createTime},
+            pay_time = #{payTime},
+            is_paid = #{isPaid},
+            is_cancelled = #{isCancelled}
+        WHERE order_id = #{orderId}
+    </update>
+
+    <!-- 根据用户ID查询订单，使用多表查询 -->
+    <select id="getOrdersByUserId" resultMap="OrderWithProductResultMap">
+        SELECT
+            o.order_id,
+            o.user_id,
+            o.order_amount,
+            o.order_status,
+            o.create_time,
+            o.pay_time,
+            o.is_paid = 1,
+            o.is_cancelled,
+            sp.id as product_id,
+            sp.name as product_name,
+            sp.description as product_description,
+            sp.price as product_price,
+            sp.image_url as product_image_url,
+            sp.stock as product_stock
+        FROM
+            orders o
+                JOIN
+            shopping_cart sc ON o.order_id = sc.order_id
+                JOIN
+            nursing_product sp ON sc.product_id = sp.id
+        WHERE
+            o.user_id = #{userId}
+    </select>
+
+
+    <!-- 查询所有订单及其关联商品信息 -->
+    <select id="selectAllOrdersWithProducts" resultMap="OrderWithProductResultMap">
+        SELECT
+            o.order_id,
+            o.user_id,
+            o.order_amount,
+            o.order_status,
+            o.create_time,
+            o.pay_time,
+            o.is_paid,
+            o.is_cancelled,
+            sp.id as product_id,
+            sp.name as product_name,
+            sp.description as product_description,
+            sp.price as product_price,
+            sp.image_url as product_image_url,
+            sp.stock as product_stock
+        FROM
+            orders o
+                JOIN
+            shopping_cart sc ON o.order_id = sc.order_id
+                JOIN
+            nursing_product sp ON sc.product_id = sp.id
+        ORDER BY
+            o.create_time DESC
+    </select>
+
+    <!-- 新增的结果映射，用于映射订单和商品信息 -->
+    <resultMap id="OrderWithProductResultMap" type="com.project.model.vo.OrderWithProduct">
+        <id column="order_id" jdbcType="BIGINT" property="orderId"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="order_amount" jdbcType="DECIMAL" property="orderAmount"/>
+        <result column="order_status" jdbcType="VARCHAR" property="orderStatus"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="pay_time" jdbcType="TIMESTAMP" property="payTime"/>
+        <result column="is_paid" jdbcType="TINYINT" property="isPaid"/>
+        <result column="is_cancelled" jdbcType="TINYINT" property="isCancelled"/>
+        <result column="product_id" jdbcType="BIGINT" property="productId"/>
+        <result column="product_name" jdbcType="VARCHAR" property="productName"/>
+        <result column="product_description" jdbcType="VARCHAR" property="productDescription"/>
+        <result column="product_price" jdbcType="DOUBLE" property="productPrice"/>
+        <result column="product_image_url" jdbcType="VARCHAR" property="productImageUrl"/>
+        <result column="product_stock" jdbcType="INTEGER" property="productStock"/>
+    </resultMap>
+
 </mapper>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.mapper.RhinitisTypeMapper">
+
+    <resultMap id="BaseResultMap" type="com.project.model.RhinitisType">
+        <id column="rid" jdbcType="BIGINT" property="rid"/>
+        <result column="rhinitis_type" jdbcType="VARCHAR" property="rhinitisType"/>
+        <result column="symptom" jdbcType="VARCHAR" property="symptom"/>
+        <result column="cause" jdbcType="VARCHAR" property="cause"/>
+        <result column="treatment_method" jdbcType="VARCHAR" property="treatmentMethod"/>
+        <result column="notice" jdbcType="VARCHAR" property="notice"/>
+        <result column="image_guid" jdbcType="VARCHAR" property="imageGuid"/>
+        <result column="isdelete" jdbcType="TINYINT" property="isdelete"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        rid, rhinitis_type, symptom, cause, treatment_method, notice, image_guid, isdelete
+    </sql>
+
+    <select id="selectAllRhinitisTypes" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM rhinitis_type
+        WHERE isdelete = 0
+    </select>
+
+    <select id="getRhinitisTypeById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM rhinitis_type
+        WHERE rid = #{rid} AND isdelete = 0
+    </select>
+
+    <insert id="insertRhinitisType" parameterType="com.project.model.RhinitisType" useGeneratedKeys="true" keyProperty="rid">
+        INSERT INTO rhinitis_type
+        (rhinitis_type, symptom, cause, treatment_method, notice, image_guid, isdelete)
+        VALUES
+            (#{rhinitisType}, #{symptom}, #{cause}, #{treatmentMethod}, #{notice}, #{imageGuid}, 0)
+    </insert>
+
+    <update id="updateRhinitisType" parameterType="com.project.model.RhinitisType">
+        UPDATE rhinitis_type
+        SET rhinitis_type = #{rhinitisType},
+            symptom = #{symptom},
+            cause = #{cause},
+            treatment_method = #{treatmentMethod},
+            notice = #{notice},
+            image_guid = #{imageGuid}
+        WHERE rid = #{rid}
+    </update>
+
+    <update id="deleteRhinitisType" parameterType="Long">
+        UPDATE rhinitis_type
+        SET isdelete = 1
+        WHERE rid = #{rid}
+    </update>
+</mapper>

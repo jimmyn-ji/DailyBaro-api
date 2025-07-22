@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.mapper.ShoppingCartMapper">
+
+    <!-- 实体类字段映射 -->
+    <resultMap id="BaseResultMap" type="com.project.model.ShoppingCartItem">
+        <id column="item_id" jdbcType="BIGINT" property="itemId"/>
+        <result column="product_id" jdbcType="BIGINT" property="productId"/>
+        <result column="quantity" jdbcType="INTEGER" property="quantity"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="add_time" jdbcType="TIMESTAMP" property="addTime"/>
+        <result column="isdeleted" jdbcType="TINYINT" property="isdeleted"/>
+        <result column="order_id" jdbcType="BIGINT" property="orderId"/>
+    </resultMap>
+
+    <!-- 购物车项VO（包含商品信息）映射 -->
+    <resultMap id="ShoppingCartItemVOResultMap" type="com.project.model.vo.ShoppingCartItemVO" extends="BaseResultMap">
+        <result column="name" jdbcType="VARCHAR" property="productName"/>
+        <result column="image_url" jdbcType="VARCHAR" property="productImageUrl"/>
+        <result column="price" jdbcType="DOUBLE" property="price"/>
+    </resultMap>
+
+    <!-- 字段列表 -->
+    <sql id="Base_Column_List">
+        item_id, product_id, quantity, user_id, add_time, isdeleted, order_id
+    </sql>
+
+    <!-- 根据用户ID和产品ID查询购物车项，排除已逻辑删除的项 -->
+    <select id="selectByUserIdAndProductId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM shopping_cart
+        WHERE user_id = #{userId} AND product_id = #{productId} AND isdeleted = 0
+    </select>
+
+    <!-- 添加商品到购物车，默认isdeleted为0（未删除） -->
+    <insert id="addToCart" useGeneratedKeys="true" keyProperty="itemId">
+        INSERT INTO shopping_cart (product_id, quantity, user_id, add_time, isdeleted, order_id)
+        VALUES (#{productId}, #{quantity}, #{userId}, #{addTime}, 0, #{orderId})
+    </insert>
+
+    <!-- 更新购物车中商品数量，仅更新未逻辑删除的项 -->
+    <update id="updateQuantity" parameterType="com.project.model.ShoppingCartItem">
+        UPDATE shopping_cart
+        SET quantity = #{quantity}
+        WHERE item_id = #{itemId} AND isdeleted = 0
+    </update>
+
+    <!-- 获取所有未逻辑删除的购物车项 -->
+    <select id="getCartItems" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM shopping_cart
+        WHERE isdeleted = 0
+    </select>
+
+    <!-- 根据用户ID获取未逻辑删除的购物车项 -->
+    <select id="getCartItemsByUid" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM shopping_cart
+        WHERE user_id = #{userId} AND isdeleted = 0
+    </select>
+
+    <!-- 根据购物车项ID查询未逻辑删除的项 -->
+    <select id="getCartItemById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM shopping_cart
+        WHERE item_id = #{itemId} AND isdeleted = 0
+    </select>
+
+    <!-- 更新购物车项，预留可更新的字段，即使当前只更新quantity，未来可扩展 -->
+    <update id="updateCartItem" parameterType="com.project.model.ShoppingCartItem">
+        UPDATE shopping_cart
+        SET isdeleted = 1,
+            order_id = #{orderId}
+        WHERE item_id = #{itemId}
+    </update>
+
+    <!-- 删除购物车项（物理删除） -->
+    <delete id="deleteCartItem" parameterType="Long">
+        DELETE FROM shopping_cart
+        WHERE item_id = #{itemId}
+    </delete>
+
+
+    <!-- 根据 product_id 查询商品信息：名称、图片、价格，关联查询并排除已逻辑删除的购物车项 -->
+    <select id="getProductInfoByProductId" resultMap="ShoppingCartItemVOResultMap">
+        SELECT
+            sc.item_id, sc.product_id, sc.quantity, sc.user_id, sc.add_time, sc.isdeleted, sc.order_id,
+            np.name, np.image_url, np.price
+        FROM shopping_cart sc
+                 LEFT JOIN nursing_product np ON sc.product_id = np.id
+        WHERE sc.product_id = #{productId} AND sc.isdeleted = 0
+    </select>
+
+    <!-- 批量更新购物车项的 orderId 和 isdeleted 字段 -->
+    <update id="updateCartItems" parameterType="java.util.List">
+        <foreach collection="cartItems" item="cartItem" separator=";">
+            UPDATE shopping_cart
+            SET order_id = #{cartItem.orderId},
+            isdeleted = #{cartItem.isdeleted}
+            WHERE item_id = #{cartItem.itemId}
+        </foreach>
+    </update>
+
+</mapper>
