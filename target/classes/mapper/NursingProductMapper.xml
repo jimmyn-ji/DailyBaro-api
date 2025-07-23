@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.mapper.NursingProductMapper">
+    <resultMap id="BaseResultMap" type="com.project.model.NursingProduct">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="price" property="price" jdbcType="DECIMAL"/>
+        <result column="image_url" property="imageUrl" jdbcType="VARCHAR"/>
+        <result column="isdeleted" property="isdeleted" jdbcType="BOOLEAN"/>
+        <result column="stock" property="stock" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, name, description, price, image_url, isdeleted, stock
+    </sql>
+
+    <!-- 获取所有护理商品 -->
+    <select id="getAllProducts" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM nursing_product
+        ORDER BY id
+    </select>
+
+    <!-- 根据ID查询护理商品 -->
+    <select id="getProductById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM nursing_product
+        WHERE id = #{productId}
+    </select>
+
+    <!-- 根据名称查询护理商品 -->
+    <select id="getProductByName" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM nursing_product
+        WHERE name = #{name}
+        LIMIT 1
+    </select>
+
+    <!-- 新增护理商品 -->
+    <insert id="insertProduct" parameterType="com.project.model.NursingProduct"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO nursing_product (name, description, price, image_url, isdeleted, stock)
+        VALUES (#{name}, #{description}, #{price}, #{imageUrl}, #{isdeleted}, #{stock})
+    </insert>
+
+    <!-- 更新护理商品 -->
+    <update id="updateProduct" parameterType="com.project.model.NursingProduct">
+        UPDATE nursing_product
+        SET name = #{name},
+            description = #{description},
+            price = #{price},
+            image_url = #{imageUrl},
+            isdeleted = #{isdeleted},
+            stock = #{stock}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除护理商品 -->
+    <delete id="deleteProduct" parameterType="java.lang.Integer">
+        DELETE FROM nursing_product
+        WHERE id = #{productId}
+    </delete>
+</mapper>
