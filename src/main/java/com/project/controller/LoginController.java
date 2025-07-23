@@ -16,6 +16,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +35,8 @@ public class LoginController {
     @Autowired
     private UserMapper userMapper;
 
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     @Value("${wx.appId}")
     private String appId;
 
@@ -50,7 +53,7 @@ public class LoginController {
         if (user == null) {
             return Result.fail("账号不存在");
         }
-        if (user != null && userPwDTO.getPassword().equals(user.getPassword())) {
+        if (user != null && passwordEncoder.matches(userPwDTO.getPassword(), user.getPassword())) {
             userInfo.setUid(user.getUid());
             userInfo.setAccount(user.getAccount());
 
@@ -67,7 +70,7 @@ public class LoginController {
 
         User newUser = new User();
         newUser.setAccount(userRegisterDTO.getAccount());
-        newUser.setPassword(userRegisterDTO.getPassword());
+        newUser.setPassword(passwordEncoder.encode(userRegisterDTO.getPassword()));
         newUser.setStatus(0);
         newUser.setIsdelete(0);
 

@@ -20,4 +20,9 @@ public class FileUploadController {
     public Result<String> uploadImage(@RequestParam("file") MultipartFile file) {
         return fileStorageService.storeFile(file);
     }
+
+    @PostMapping("/media")
+    public Result<String> uploadMedia(@RequestParam("file") MultipartFile file) {
+        return fileStorageService.storeFile(file); // 支持所有类型
+    }
 }

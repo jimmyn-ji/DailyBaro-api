@@ -55,4 +55,10 @@ public class UsersController {
         userService.updateUserInfo(user);
         return Result.success("个人信息修改成功");
     }
+
+    @DeleteMapping("/delete/{uid}")
+    public Result<Void> deleteUser(@PathVariable Long uid) {
+        userService.deleteUser(uid);
+        return Result.success();
+    }
 }

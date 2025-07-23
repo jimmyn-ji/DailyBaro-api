@@ -7,6 +7,7 @@ import com.project.mapper.UserMapper;
 import com.project.model.User;
 import com.project.model.dto.UpdatePwdDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +17,8 @@ public class UserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     /**
      * 分页查询用户
@@ -38,8 +41,8 @@ public class UserService {
      */
     public void changePassword(UpdatePwdDTO updatePwdDTO) {
         User user = userMapper.getMyInfo(updatePwdDTO.getUid());
-        if (user != null && user.getPassword().equals(updatePwdDTO.getOldPassword())) {
-            userMapper.updateUserPassword(updatePwdDTO.getUid(), updatePwdDTO.getNewPassword());
+        if (user != null && passwordEncoder.matches(updatePwdDTO.getOldPassword(), user.getPassword())) {
+            userMapper.updateUserPassword(updatePwdDTO.getUid(), passwordEncoder.encode(updatePwdDTO.getNewPassword()));
         } else {
             throw new RuntimeException("旧密码错误");
         }
@@ -51,5 +54,16 @@ public class UserService {
      */
     public void updateUserInfo(User user) {
         userMapper.updateUserInfo(user);
+    }
+
+    /**
+     * 软删除用户
+     */
+    public void deleteUser(Long uid) {
+        User user = userMapper.getMyInfo(uid);
+        if (user != null) {
+            user.setIsdelete(1);
+            userMapper.updateUserInfo(user);
+        }
     }
 }
