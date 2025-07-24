@@ -6,6 +6,7 @@ import com.github.pagehelper.PageInfo;
 import com.project.mapper.UserMapper;
 import com.project.model.User;
 import com.project.model.dto.UpdatePwdDTO;
+import com.project.model.dto.UpdateUserInfoDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,10 @@ public class UserService {
         return userMapper.getMyInfo(uid);
     }
 
+    public User getByAccount(String account) {
+        return userMapper.selectByAccount(account);
+    }
+
     /**
      * 修改密码
      */
@@ -52,7 +57,11 @@ public class UserService {
      * 修改个人信息
      * @param user 用户信息
      */
-    public void updateUserInfo(User user) {
+    public void updateUserInfo(UpdateUserInfoDTO dto) {
+        User user = userMapper.getMyInfo(dto.getUid());
+        if (user == null) throw new RuntimeException("用户不存在");
+        if (dto.getPhone() != null) user.setPhone(dto.getPhone());
+        if (dto.getEmail() != null) user.setEmail(dto.getEmail());
         userMapper.updateUserInfo(user);
     }
 
@@ -65,5 +74,18 @@ public class UserService {
             user.setIsdelete(1);
             userMapper.updateUserInfo(user);
         }
+    }
+
+    /**
+     * 注销账号（需密码校验）
+     */
+    public boolean deleteUserWithPwd(Long uid, String password) {
+        User user = userMapper.getMyInfo(uid);
+        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
+            user.setIsdelete(1);
+            userMapper.updateUserInfo(user);
+            return true;
+        }
+        return false;
     }
 }

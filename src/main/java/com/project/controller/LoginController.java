@@ -53,6 +53,9 @@ public class LoginController {
         if (user == null) {
             return Result.fail("账号不存在");
         }
+        if (user.getIsdelete() != null && user.getIsdelete() == 1) {
+            return Result.fail("该账号已被注销，无法登录");
+        }
         if (user != null && passwordEncoder.matches(userPwDTO.getPassword(), user.getPassword())) {
             userInfo.setUid(user.getUid());
             userInfo.setAccount(user.getAccount());

@@ -3,13 +3,16 @@ package com.project.controller;
 import com.github.pagehelper.PageInfo;
 import com.project.model.User;
 import com.project.model.dto.UpdatePwdDTO;
+import com.project.model.dto.UpdateUserInfoDTO;
 import com.project.service.UserService;
 import com.project.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/user")
 public class UsersController {
 
     @Autowired
@@ -46,19 +49,55 @@ public class UsersController {
     }
 
     /**
-     * 修改个人信息
-     * @param user 用户信息
+     * 修改个人信息（PUT 方式，兼容前端）
+     * @param dto 用户信息
      * @return 操作结果
      */
-    @PostMapping("/updateUserInfo")
-    public Result<String> updateUserInfo(@RequestBody User user) {
-        userService.updateUserInfo(user);
+    @PutMapping("/updateUserInfo")
+    public Result<String> updateUserInfo(@RequestBody UpdateUserInfoDTO dto) {
+        userService.updateUserInfo(dto);
         return Result.success("个人信息修改成功");
     }
 
+    /**
+     * 兼容前端 /user/selectUserInfo POST 请求
+     */
+    @PostMapping("/selectUserInfo")
+    public Result<User> selectUserInfo(@RequestBody Map<String, Object> params) {
+        User user = null;
+        if (params.containsKey("uid")) {
+            Long uid = Long.valueOf(params.get("uid").toString());
+            user = userService.getMyInfo(uid);
+        } else if (params.containsKey("account")) {
+            user = userService.getByAccount(params.get("account").toString());
+        }
+        if (user == null) {
+            return Result.fail("用户不存在");
+        }
+        return Result.success(user);
+    }
+
+    /**
+     * 账号删除（允许未登录操作）
+     * @param uid 用户ID
+     * @return 操作结果
+     */
     @DeleteMapping("/delete/{uid}")
     public Result<Void> deleteUser(@PathVariable Long uid) {
         userService.deleteUser(uid);
         return Result.success();
+    }
+
+    /**
+     * 注销账号（需密码校验）
+     */
+    @PostMapping("/deleteWithPwd")
+    public Result<Void> deleteUserWithPwd(@RequestParam Long uid, @RequestParam String password) {
+        boolean ok = userService.deleteUserWithPwd(uid, password);
+        if (ok) {
+            return Result.success();
+        } else {
+            return Result.fail("密码错误，注销失败");
+        }
     }
 }

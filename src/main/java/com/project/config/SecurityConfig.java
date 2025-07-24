@@ -23,6 +23,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/login/doLogin", "/login/doRegister","/login/wxLogin").permitAll()
                 // 允许其他接口无需认证
                 .antMatchers("/users/**","/rhinitisType/**","/consultation/**","/uploads/**","/slider/**","/comments/**","/product/**","/shoppingCart/**","/order/**","/post/**").permitAll()
+                .antMatchers("/api/**").permitAll() // 新增，放开 /api 下所有接口
+                .antMatchers("/user/**").permitAll()
                 .anyRequest().authenticated(); // 其他请求需要身份验证
     }
 
