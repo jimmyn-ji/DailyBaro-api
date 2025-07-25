@@ -22,13 +22,15 @@ public class DeepSeekAIServiceImpl implements AIService {
 
     @Override
     public Result<String> getGeneralResponse(String question) {
-        return callDeepSeek(question);
+        // 优化智能问答prompt，要求结构化、分段、无markdown符号
+        String prompt = "请以心理健康专家的身份，针对以下问题，给出科学、结构化、分段的解答。要求：1. 只用普通文本，不要使用markdown符号（如**、#、-等）、emoji或特殊排版；2. 内容分条、分段清晰，逻辑工整；3. 语言客观、简明。问题：" + question;
+        return callDeepSeek(prompt);
     }
 
     @Override
     public Result<String> getResponseForDiary(String diaryContent) {
-        // 这里可以自定义prompt
-        String prompt = "你是一个情绪分析师，请根据以下日记内容，分析情绪并给出建议：" + diaryContent;
+        // 优化prompt：即使内容较少也要尽量分析
+        String prompt = "你是一个专业的情绪分析师，请根据以下日记内容，客观分析主要情绪及其可能原因，并给出简明建议。即使内容较少或表达模糊，也请基于已有信息尽量推测情绪类型和调节建议，不要只回复无法分析或让用户补充内容。输出要求：1. 先简要分析情绪及原因；2. 再给出具体建议；3. 不要使用markdown加粗、emoji或主观感叹词，直接分段输出。日记内容：" + diaryContent;
         return callDeepSeek(prompt);
     }
 
