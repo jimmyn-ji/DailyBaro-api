@@ -25,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -57,13 +59,17 @@ public class DiaryServiceImpl implements DiaryService {
         diary.setUserId(userId);
         diary.setTitle(createDiaryDTO.getTitle());
         diary.setContent(createDiaryDTO.getContent());
-        diary.setStatus("published"); // Default status
+        diary.setStatus(createDiaryDTO.getStatus()); // Ensure status is set
         diary.setCreateTime(new Date());
         diary.setUpdateTime(new Date());
         diaryMapper.insert(diary);
 
         // 2. Handle tags
+        if (createDiaryDTO.getTagIds() != null && !createDiaryDTO.getTagIds().isEmpty()) {
+            handleTagsByIds(createDiaryDTO.getTagIds(), diary.getDiaryId());
+        } else {
         handleTags(createDiaryDTO.getTags(), diary.getDiaryId(), userId);
+        }
 
         // 3. Handle media files
         if (!CollectionUtils.isEmpty(createDiaryDTO.getMediaFiles())) {
@@ -76,7 +82,6 @@ public class DiaryServiceImpl implements DiaryService {
                     media.setMediaType(determineMediaType(file.getContentType()));
                     diaryMediaMapper.insert(media);
                 } else {
-                    // In a real app, you might want to roll back the transaction
                     log.error("Failed to upload file for diary {}: {}", diary.getDiaryId(), uploadResult.getMessage());
                 }
             }
@@ -112,6 +117,16 @@ public class DiaryServiceImpl implements DiaryService {
         }
     }
 
+    private void handleTagsByIds(List<Long> tagIds, Long diaryId) {
+        if (CollectionUtils.isEmpty(tagIds)) return;
+        for (Long tagId : tagIds) {
+            DiaryTag diaryTag = new DiaryTag();
+            diaryTag.setDiaryId(diaryId);
+            diaryTag.setTagId(tagId);
+            diaryTagMapper.insert(diaryTag);
+        }
+    }
+
     private String determineMediaType(String contentType) {
         if (contentType == null) {
             return "unknown";
@@ -121,6 +136,9 @@ public class DiaryServiceImpl implements DiaryService {
         } else if (contentType.startsWith("video/")) {
             return "video";
         } else if (contentType.startsWith("audio/")) {
+            return "audio";
+        } else if (contentType.equals("application/octet-stream")) {
+            // 某些音频文件可能是octet-stream，尝试兜底为audio
             return "audio";
         }
         return "unknown";
@@ -136,6 +154,7 @@ public class DiaryServiceImpl implements DiaryService {
         // 1. 更新基本字段
         if (updateDiaryDTO.getTitle() != null) diary.setTitle(updateDiaryDTO.getTitle());
         if (updateDiaryDTO.getContent() != null) diary.setContent(updateDiaryDTO.getContent());
+        diary.setStatus(updateDiaryDTO.getStatus()); // Ensure status is updated
         diary.setUpdateTime(new Date());
         diaryMapper.updateById(diary);
 
@@ -143,7 +162,11 @@ public class DiaryServiceImpl implements DiaryService {
         QueryWrapper<DiaryTag> tagDelQuery = new QueryWrapper<>();
         tagDelQuery.eq("diary_id", diary.getDiaryId());
         diaryTagMapper.delete(tagDelQuery);
+        if (updateDiaryDTO.getTagIds() != null && !updateDiaryDTO.getTagIds().isEmpty()) {
+            handleTagsByIds(updateDiaryDTO.getTagIds(), diary.getDiaryId());
+        } else {
         handleTags(updateDiaryDTO.getTags(), diary.getDiaryId(), diary.getUserId());
+        }
 
         // 3. 处理媒体
         if (!CollectionUtils.isEmpty(updateDiaryDTO.getMediaIdsToDelete())) {
@@ -226,8 +249,9 @@ public class DiaryServiceImpl implements DiaryService {
         diaryTagQuery.eq("diary_id", diaryId);
         List<DiaryTag> diaryTags = diaryTagMapper.selectList(diaryTagQuery);
         List<String> tagNames = Collections.emptyList();
+        List<Long> tagIds = Collections.emptyList();
         if (!CollectionUtils.isEmpty(diaryTags)) {
-            List<Long> tagIds = diaryTags.stream().map(DiaryTag::getTagId).collect(Collectors.toList());
+            tagIds = diaryTags.stream().map(DiaryTag::getTagId).collect(Collectors.toList());
             List<Tag> tags = tagMapper.selectBatchIds(tagIds);
             tagNames = tags.stream().map(Tag::getTagName).collect(Collectors.toList());
         }
@@ -242,11 +266,11 @@ public class DiaryServiceImpl implements DiaryService {
             return vo;
         }).collect(Collectors.toList());
 
-
         // Assemble and return VO
         DiaryVO diaryVO = new DiaryVO();
         BeanUtils.copyProperties(diary, diaryVO);
         diaryVO.setTags(tagNames);
+        diaryVO.setTagIds(tagIds);
         diaryVO.setMedia(mediaVOs);
 
         return Result.success(diaryVO);
@@ -254,10 +278,30 @@ public class DiaryServiceImpl implements DiaryService {
 
     @Override
     public Result<List<DiaryVO>> findDiaries(QueryDiaryDTO queryDiaryDTO, Long userId) {
-        // This will require a more complex custom query in DiaryMapper.xml later to handle filtering by date and tags efficiently.
-        // For now, let's just return all diaries for the user.
         QueryWrapper<Diary> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", userId).orderByDesc("create_time");
+        queryWrapper.eq("user_id", userId);
+
+        // 按日期筛选（只查某一天）
+        if (queryDiaryDTO.getDate() != null && !queryDiaryDTO.getDate().isEmpty()) {
+            queryWrapper.like("create_time", queryDiaryDTO.getDate());
+        }
+
+        // 按标签ID筛选
+        if (queryDiaryDTO.getTagIds() != null && !queryDiaryDTO.getTagIds().isEmpty()) {
+            List<Long> diaryIds = diaryTagMapper.findDiaryIdsByTagIds(queryDiaryDTO.getTagIds());
+            if (!diaryIds.isEmpty()) {
+                queryWrapper.in("diary_id", diaryIds);
+            } else {
+                return Result.success(Collections.emptyList());
+            }
+        }
+
+        // 按状态筛选
+        if (queryDiaryDTO.getStatus() != null && !queryDiaryDTO.getStatus().isEmpty()) {
+            queryWrapper.eq("status", queryDiaryDTO.getStatus());
+        }
+
+        queryWrapper.orderByDesc("create_time");
         List<Diary> diaries = diaryMapper.selectList(queryWrapper);
 
         List<DiaryVO> diaryVOs = diaries.stream()

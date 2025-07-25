@@ -9,8 +9,8 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   servlet:
     multipart:
-      max-file-size: 5MB
-      max-request-size: 10MB
+      max-file-size: 50MB
+      max-request-size: 100MB
   mail:
     host: smtp.qq.com
     port: 465
@@ -29,7 +29,7 @@ mybatis:
 
 # 文件上传配置
 file:
-  upload-dir: /Users/minchi/Desktop/毕设/4.鼻炎小程序/源码/rhinitis-api/src/main/resources/uploads/
+  upload-dir: /Users/minchi/Desktop/DailyBaro/DailyBaro-api/src/main/resources/uploads/
 
 logging:
   level:

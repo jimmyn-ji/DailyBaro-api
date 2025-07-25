@@ -14,5 +14,6 @@ public class DiaryVO {
     private Date createTime;
     private Date updateTime;
     private List<String> tags; // List of tag names
+    private List<Long> tagIds; // 新增，标签id数组
     private List<MediaVO> media; // List of media objects
 } 
