@@ -11,14 +11,14 @@
     </parent>
 
     <groupId>com.project</groupId>
-    <artifactId>Rhinitis-backend</artifactId>
+    <artifactId>DailyBaro-backend</artifactId>
     <version>1.0.0-RELEASE</version>
-    <name>Rhinitis-backend</name>
+    <name>DailyBaro-backend</name>
     <packaging>jar</packaging>
     <description>后台</description>
 
     <properties>
-        <java.version>8</java.version>
+        <java.version>17</java.version>
         <fastjson.version>2.0.48</fastjson.version>
         <lombok.version>1.18.32</lombok.version>
         <mybatis-plus.version>3.5.5</mybatis-plus.version>

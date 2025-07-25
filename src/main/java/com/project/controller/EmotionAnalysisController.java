@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -21,20 +22,43 @@ public class EmotionAnalysisController {
     @Autowired
     private EmotionAnalysisService emotionAnalysisService;
 
-    // Placeholder for the logged-in user ID
-    private static final Long MOCK_USER_ID = 1L;
 
     @GetMapping("/fluctuation")
     public Result<List<EmotionDataPointVO>> getFluctuation(
+            @RequestParam Long userId,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
-        return emotionAnalysisService.getEmotionFluctuation(MOCK_USER_ID, startDate, endDate);
+        Date realStart = getDayStart(startDate);
+        Date realEnd = getDayEnd(endDate);
+        return emotionAnalysisService.getEmotionFluctuation(userId, realStart, realEnd);
     }
 
     @GetMapping("/distribution")
     public Result<List<EmotionShareVO>> getDistribution(
+            @RequestParam Long userId,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
-        return emotionAnalysisService.getEmotionDistribution(MOCK_USER_ID, startDate, endDate);
+        Date realStart = getDayStart(startDate);
+        Date realEnd = getDayEnd(endDate);
+        return emotionAnalysisService.getEmotionDistribution(userId, realStart, realEnd);
+    }
+
+    private Date getDayStart(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
+    private Date getDayEnd(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND, 999);
+        return cal.getTime();
     }
 } 

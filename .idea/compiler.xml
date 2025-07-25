@@ -9,20 +9,16 @@
         <outputRelativeToContentRoot value="true" />
         <module name="hanfu-backend" />
         <module name="customsys-backend" />
-        <module name="Rhinitis-backend" />
         <module name="flower-backend" />
         <module name="customsys" />
+        <module name="DailyBaro-backend" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_STRING" value="-Djps.track.ap.dependencies=true" />
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="Rhinitis-backend" options="-parameters" />
-      <module name="customsys" options="-parameters" />
-      <module name="customsys-backend" options="-parameters" />
-      <module name="flower-backend" options="-parameters" />
-      <module name="hanfu-backend" options="-parameters" />
+      <module name="DailyBaro-backend" options="-parameters" />
     </option>
   </component>
 </project>

@@ -10,5 +10,11 @@
         WHERE d.user_id = #{userId}
         AND d.create_time BETWEEN #{startDate} AND #{endDate}
     </select>
+    <select id="findTagsByDiaryId" resultType="java.lang.String">
+        SELECT t.tag_name
+        FROM diary_tags dt
+        JOIN tags t ON dt.tag_id = t.tag_id
+        WHERE dt.diary_id = #{diaryId}
+    </select>
 
 </mapper> 

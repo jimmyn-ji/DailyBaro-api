@@ -18,6 +18,7 @@ public interface EmotionAnalysisService {
      * @return 情绪数据点列表
      */
     Result<List<EmotionDataPointVO>> getEmotionFluctuation(Long userId, Date startDate, Date endDate);
+    Result<List<EmotionDataPointVO>> getEmotionFluctuation(Long userId, Date startDate, Date endDate, Long tagId);
 
     /**
      * 获取指定时间范围内各情绪的占比
@@ -27,5 +28,6 @@ public interface EmotionAnalysisService {
      * @return 情绪占比列表
      */
     Result<List<EmotionShareVO>> getEmotionDistribution(Long userId, Date startDate, Date endDate);
+    Result<List<EmotionShareVO>> getEmotionDistribution(Long userId, Date startDate, Date endDate, Long tagId);
 
 } 

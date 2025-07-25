@@ -27,7 +27,9 @@ public class DeepSeekAIServiceImpl implements AIService {
 
     @Override
     public Result<String> getResponseForDiary(String diaryContent) {
-        return callDeepSeek("请根据以下日记内容，给出情绪分析和建议：" + diaryContent);
+        // 这里可以自定义prompt
+        String prompt = "你是一个情绪分析师，请根据以下日记内容，分析情绪并给出建议：" + diaryContent;
+        return callDeepSeek(prompt);
     }
 
     private Result<String> callDeepSeek(String prompt) {
@@ -37,16 +39,21 @@ public class DeepSeekAIServiceImpl implements AIService {
 
         Map<String, Object> body = new HashMap<>();
         body.put("model", "deepseek-chat");
-        Map<String, Object> userMessage = new HashMap<>();
-        userMessage.put("role", "user");
-        userMessage.put("content", prompt);
-        body.put("messages", Collections.singletonList(userMessage));
+        List<Map<String, String>> messages = new ArrayList<>();
+        Map<String, String> systemMsg = new HashMap<>();
+        systemMsg.put("role", "system");
+        systemMsg.put("content", "你是一个情绪分析师。");
+        messages.add(systemMsg);
+        Map<String, String> userMsg = new HashMap<>();
+        userMsg.put("role", "user");
+        userMsg.put("content", prompt);
+        messages.add(userMsg);
+        body.put("messages", messages);
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
 
         try {
             ResponseEntity<Map> response = restTemplate.postForEntity(apiUrl, entity, Map.class);
-            // 解析返回内容（请根据DeepSeek实际返回结构调整）
             List choices = (List) response.getBody().get("choices");
             if (choices != null && !choices.isEmpty()) {
                 Map choice = (Map) choices.get(0);
