@@ -15,7 +15,7 @@ public class InterceptorConfig extends WebMvcConfigurationSupport {
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
         // 添加图片资源映射
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:" + uploadDir);
+                .addResourceLocations("file:" + uploadDir + "/");
     }
 
     /**

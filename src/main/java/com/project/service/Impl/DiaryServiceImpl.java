@@ -88,7 +88,7 @@ public class DiaryServiceImpl implements DiaryService {
         }
 
         // 4. Convert final entity to VO and return
-        return getDiaryById(diary.getDiaryId());
+        return getDiaryById(diary.getDiaryId(), userId);
     }
 
     private void handleTags(List<String> tagNames, Long diaryId, Long userId) {
@@ -151,6 +151,12 @@ public class DiaryServiceImpl implements DiaryService {
         if (diary == null) {
             return Result.fail("日记不存在");
         }
+        
+        // 权限检查：只有日记作者才能编辑
+        if (!diary.getUserId().equals(updateDiaryDTO.getUserId())) {
+            return Result.fail("无权编辑此日记");
+        }
+        
         // 1. 更新基本字段
         if (updateDiaryDTO.getTitle() != null) diary.setTitle(updateDiaryDTO.getTitle());
         if (updateDiaryDTO.getContent() != null) diary.setContent(updateDiaryDTO.getContent());
@@ -192,16 +198,22 @@ public class DiaryServiceImpl implements DiaryService {
                 }
             }
         }
-        return getDiaryById(diary.getDiaryId());
+        return getDiaryById(diary.getDiaryId(), diary.getUserId());
     }
 
     @Override
     @Transactional
-    public Result<Void> deleteDiary(Long diaryId) {
+    public Result<Void> deleteDiary(Long diaryId, Long userId) {
         Diary diary = diaryMapper.selectById(diaryId);
         if (diary == null) {
             return Result.fail("日记不存在");
         }
+        
+        // 权限检查：只有日记作者才能删除
+        if (!diary.getUserId().equals(userId)) {
+            return Result.fail("无权删除此日记");
+        }
+        
         QueryWrapper<DiaryMedia> mediaQuery = new QueryWrapper<>();
         mediaQuery.eq("diary_id", diaryId);
         List<DiaryMedia> mediaList = diaryMediaMapper.selectList(mediaQuery);
@@ -214,12 +226,20 @@ public class DiaryServiceImpl implements DiaryService {
 
     @Override
     @Transactional
-    public Result<Void> deleteDiaryMedia(Long mediaId) {
+    public Result<Void> deleteDiaryMedia(Long mediaId, Long userId) {
         DiaryMedia media = diaryMediaMapper.selectById(mediaId);
-        if (media != null) {
-            deletePhysicalFile(media.getMediaUrl());
-            diaryMediaMapper.deleteById(mediaId);
+        if (media == null) {
+            return Result.fail("媒体文件不存在");
         }
+        
+        // 权限检查：只有日记作者才能删除媒体文件
+        Diary diary = diaryMapper.selectById(media.getDiaryId());
+        if (diary == null || !diary.getUserId().equals(userId)) {
+            return Result.fail("无权删除此媒体文件");
+        }
+        
+        deletePhysicalFile(media.getMediaUrl());
+        diaryMediaMapper.deleteById(mediaId);
         return Result.success();
     }
 
@@ -238,10 +258,17 @@ public class DiaryServiceImpl implements DiaryService {
     }
 
     @Override
-    public Result<DiaryVO> getDiaryById(Long diaryId) {
+    public Result<DiaryVO> getDiaryById(Long diaryId, Long userId) {
+        log.info("getDiaryById called with diaryId: {}, userId: {}", diaryId, userId);
+        
         Diary diary = diaryMapper.selectById(diaryId);
         if (diary == null) {
             return Result.fail("Diary not found.");
+        }
+
+        // 权限检查：只有日记作者才能查看草稿，其他用户只能查看已发布的日记
+        if (!diary.getUserId().equals(userId) && "draft".equals(diary.getStatus())) {
+            return Result.fail("无权查看此日记");
         }
 
         // Fetch associated tags
@@ -260,9 +287,12 @@ public class DiaryServiceImpl implements DiaryService {
         QueryWrapper<DiaryMedia> diaryMediaQuery = new QueryWrapper<>();
         diaryMediaQuery.eq("diary_id", diaryId);
         List<DiaryMedia> diaryMediaList = diaryMediaMapper.selectList(diaryMediaQuery);
+        log.info("Found {} media files for diary {}", diaryMediaList.size(), diaryId);
+        
         List<MediaVO> mediaVOs = diaryMediaList.stream().map(media -> {
             MediaVO vo = new MediaVO();
             BeanUtils.copyProperties(media, vo);
+            log.info("Media: id={}, type={}, url={}", media.getMediaId(), media.getMediaType(), media.getMediaUrl());
             return vo;
         }).collect(Collectors.toList());
 
@@ -273,13 +303,36 @@ public class DiaryServiceImpl implements DiaryService {
         diaryVO.setTagIds(tagIds);
         diaryVO.setMedia(mediaVOs);
 
+        log.info("Returning diary VO with {} media files", mediaVOs.size());
         return Result.success(diaryVO);
     }
 
     @Override
     public Result<List<DiaryVO>> findDiaries(QueryDiaryDTO queryDiaryDTO, Long userId) {
+        log.info("findDiaries called with userId: {}, targetUserId: {}, status: {}", 
+                userId, queryDiaryDTO.getTargetUserId(), queryDiaryDTO.getStatus());
+        
         QueryWrapper<Diary> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", userId);
+        
+        // 权限控制逻辑
+        if (queryDiaryDTO.getTargetUserId() != null && !queryDiaryDTO.getTargetUserId().equals(userId)) {
+            // 查看指定用户的日记：只能看到已发布的
+            log.info("Querying specific user's published diaries: {}", queryDiaryDTO.getTargetUserId());
+            queryWrapper.eq("user_id", queryDiaryDTO.getTargetUserId())
+                        .eq("status", "published");
+        } else if (queryDiaryDTO.getTargetUserId() != null && queryDiaryDTO.getTargetUserId().equals(userId)) {
+            // 查看自己的日记：可以看到所有状态（包括草稿）
+            log.info("Querying own diaries: {}", userId);
+            queryWrapper.eq("user_id", userId);
+        } else {
+            // 默认情况：显示所有用户已发布的日记 + 当前用户的草稿
+            log.info("Querying all published diaries + own drafts for user: {}", userId);
+            queryWrapper.and(wrapper -> wrapper
+                .eq("status", "published")
+                .or()
+                .eq("user_id", userId).eq("status", "draft")
+            );
+        }
 
         // 按日期筛选（只查某一天）
         if (queryDiaryDTO.getDate() != null && !queryDiaryDTO.getDate().isEmpty()) {
@@ -296,18 +349,30 @@ public class DiaryServiceImpl implements DiaryService {
             }
         }
 
-        // 按状态筛选
-        if (queryDiaryDTO.getStatus() != null && !queryDiaryDTO.getStatus().isEmpty()) {
+        // 按状态筛选（只有查看自己的日记时才允许筛选状态）
+        if (queryDiaryDTO.getStatus() != null && !queryDiaryDTO.getStatus().isEmpty() 
+            && (queryDiaryDTO.getTargetUserId() == null || queryDiaryDTO.getTargetUserId().equals(userId))) {
             queryWrapper.eq("status", queryDiaryDTO.getStatus());
         }
 
         queryWrapper.orderByDesc("create_time");
         List<Diary> diaries = diaryMapper.selectList(queryWrapper);
+        log.info("Found {} diaries", diaries.size());
 
         List<DiaryVO> diaryVOs = diaries.stream()
-                .map(diary -> getDiaryById(diary.getDiaryId()).getData())
+                .map(diary -> {
+                    try {
+                        return getDiaryById(diary.getDiaryId(), userId).getData();
+                    } catch (Exception e) {
+                        // 如果获取单个日记失败，跳过这个日记
+                        log.warn("Failed to get diary {}: {}", diary.getDiaryId(), e.getMessage());
+                        return null;
+                    }
+                })
+                .filter(diaryVO -> diaryVO != null) // 过滤掉null值
                 .collect(Collectors.toList());
 
+        log.info("Returning {} diary VOs", diaryVOs.size());
         return Result.success(diaryVOs);
     }
 } 

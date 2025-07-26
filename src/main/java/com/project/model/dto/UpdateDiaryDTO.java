@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 public class UpdateDiaryDTO {
     private Long diaryId;
+    private Long userId; // 添加用户ID字段
     private String title;
     private String content;
     private List<String> tags; // A list of tag names

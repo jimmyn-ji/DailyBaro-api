@@ -83,32 +83,31 @@
     <!-- 根据评论 ID 获取评论 -->
     <select id="getCommentById" parameterType="java.lang.Long" resultMap="BaseResultMap">
         SELECT
-        <include refid="Base_Column_List"/>
+        comment_id, post_id, user_id, content, create_time
         FROM
-        comments
+        post_comments
         WHERE
         comment_id = #{commentId}
     </select>
 
     <!-- 插入评论 -->
     <insert id="insertComment" parameterType="com.project.model.Comments" useGeneratedKeys="true" keyProperty="commentId">
-        INSERT INTO comments (post_id, user_id, content, is_reply, reply_to_comment_id, reply_to_user_id)
-        VALUES (#{postId}, #{userId}, #{content}, #{isReply}, #{replyToCommentId}, #{replyToUserId})
+        INSERT INTO post_comments (post_id, user_id, content, create_time)
+        VALUES (#{postId}, #{userId}, #{content}, NOW())
     </insert>
 
     <!-- 更新评论 -->
     <update id="updateComment" parameterType="com.project.model.Comments">
-        UPDATE comments
+        UPDATE post_comments
         SET
-            content = #{content},
-            update_time = NOW()
+            content = #{content}
         WHERE
             comment_id = #{commentId}
     </update>
 
     <!-- 删除评论 -->
     <delete id="deleteComment" parameterType="java.lang.Long">
-        DELETE FROM comments
+        DELETE FROM post_comments
         WHERE
             comment_id = #{commentId}
     </delete>
@@ -116,9 +115,9 @@
     <!-- 根据论坛 ID 获取评论列表 -->
     <select id="getCommentsByPostId" parameterType="java.lang.Long" resultMap="BaseResultMap">
         SELECT
-        <include refid="Base_Column_List"/>
+        comment_id, post_id, user_id, content, create_time
         FROM
-        comments
+        post_comments
         WHERE
         post_id = #{postId}
     </select>
@@ -126,9 +125,9 @@
     <!-- 根据用户 ID 获取评论列表 -->
     <select id="getCommentsByUserId" parameterType="java.lang.Long" resultMap="BaseResultMap">
         SELECT
-        <include refid="Base_Column_List"/>
+        comment_id, post_id, user_id, content, create_time
         FROM
-        comments
+        post_comments
         WHERE
         user_id = #{userId}
     </select>

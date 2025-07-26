@@ -9,6 +9,7 @@ import com.project.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -18,41 +19,78 @@ public class DiaryController {
     @Autowired
     private DiaryService diaryService;
 
-    // Assuming we can get the user ID from the security context,
-    // but for now, we'll pass it as a header or parameter for simplicity.
-    // In a real app, this would be handled by Spring Security.
-    private static final Long MOCK_USER_ID = 1L; // Placeholder for logged-in user
-
     @PostMapping
-    public Result<DiaryVO> createDiary(@ModelAttribute CreateDiaryDTO createDiaryDTO) {
-        // In a real implementation, the user ID would come from the security context
-        return diaryService.createDiary(createDiaryDTO, MOCK_USER_ID);
+    public Result<DiaryVO> createDiary(@ModelAttribute CreateDiaryDTO createDiaryDTO, HttpServletRequest request) {
+        Long userId = getUserIdFromRequest(request);
+        if (userId == null) {
+            return Result.fail("用户未登录");
+        }
+        return diaryService.createDiary(createDiaryDTO, userId);
     }
 
     @PutMapping("/{id}")
-    public Result<DiaryVO> updateDiary(@PathVariable("id") Long diaryId, @ModelAttribute UpdateDiaryDTO updateDiaryDTO) {
+    public Result<DiaryVO> updateDiary(@PathVariable("id") Long diaryId, @ModelAttribute UpdateDiaryDTO updateDiaryDTO, HttpServletRequest request) {
+        Long userId = getUserIdFromRequest(request);
+        if (userId == null) {
+            return Result.fail("用户未登录");
+        }
         updateDiaryDTO.setDiaryId(diaryId);
+        updateDiaryDTO.setUserId(userId); // 添加用户ID到DTO中
         return diaryService.updateDiary(updateDiaryDTO);
     }
 
     @DeleteMapping("/{id}")
-    public Result<Void> deleteDiary(@PathVariable("id") Long diaryId) {
-        return diaryService.deleteDiary(diaryId);
+    public Result<Void> deleteDiary(@PathVariable("id") Long diaryId, HttpServletRequest request) {
+        Long userId = getUserIdFromRequest(request);
+        if (userId == null) {
+            return Result.fail("用户未登录");
+        }
+        return diaryService.deleteDiary(diaryId, userId);
     }
 
     @DeleteMapping("/media/{mediaId}")
-    public Result<Void> deleteDiaryMedia(@PathVariable("mediaId") Long mediaId) {
-        return diaryService.deleteDiaryMedia(mediaId);
+    public Result<Void> deleteDiaryMedia(@PathVariable("mediaId") Long mediaId, HttpServletRequest request) {
+        Long userId = getUserIdFromRequest(request);
+        if (userId == null) {
+            return Result.fail("用户未登录");
+        }
+        return diaryService.deleteDiaryMedia(mediaId, userId);
     }
 
     @GetMapping("/{id}")
-    public Result<DiaryVO> getDiaryById(@PathVariable("id") Long diaryId) {
-        return diaryService.getDiaryById(diaryId);
+    public Result<DiaryVO> getDiaryById(@PathVariable("id") Long diaryId, HttpServletRequest request) {
+        Long userId = getUserIdFromRequest(request);
+        if (userId == null) {
+            return Result.fail("用户未登录");
+        }
+        return diaryService.getDiaryById(diaryId, userId);
     }
 
     @GetMapping
-    public Result<List<DiaryVO>> findDiaries(QueryDiaryDTO queryDiaryDTO) {
-        // In a real implementation, the user ID would come from the security context
-        return diaryService.findDiaries(queryDiaryDTO, MOCK_USER_ID);
+    public Result<List<DiaryVO>> findDiaries(QueryDiaryDTO queryDiaryDTO, @RequestParam(required = false) Long targetUserId, HttpServletRequest request) {
+        Long userId = getUserIdFromRequest(request);
+        if (userId == null) {
+            return Result.fail("用户未登录");
+        }
+        // 如果指定了targetUserId，则查询指定用户的日记
+        if (targetUserId != null) {
+            queryDiaryDTO.setTargetUserId(targetUserId);
+        }
+        return diaryService.findDiaries(queryDiaryDTO, userId);
+    }
+
+    /**
+     * 从请求头中获取用户ID
+     */
+    private Long getUserIdFromRequest(HttpServletRequest request) {
+        String uidHeader = request.getHeader("uid");
+        if (uidHeader != null && !uidHeader.trim().isEmpty()) {
+            try {
+                return Long.parseLong(uidHeader.trim());
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+        return null;
     }
 } 

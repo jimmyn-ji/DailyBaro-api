@@ -12,4 +12,6 @@ public class AnonymousPostVO {
     private Date createTime;
     private int likeCount;
     private int commentCount;
+    private java.util.List<com.project.model.Comments> comments;
+    private boolean liked;
 } 

@@ -11,9 +11,9 @@ public interface AnonymousPostService {
 
     Result<Void> deletePost(Long postId, Long userId);
 
-    Result<List<AnonymousPostVO>> getPublicPosts();
+    Result<List<AnonymousPostVO>> getPublicPosts(Long currentUserId);
 
-    Result<AnonymousPostVO> getPostById(Long postId);
+    Result<AnonymousPostVO> getPostById(Long postId, Long userId);
 
     Result<Void> likePost(Long postId, Long userId);
 

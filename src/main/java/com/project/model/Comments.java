@@ -7,7 +7,7 @@ import org.springframework.data.annotation.Id;
 import java.util.Date;
 
 @Data
-@TableName("comments")
+@TableName("post_comments")
 public class Comments {
     @Id
     private Long commentId;

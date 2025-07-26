@@ -13,11 +13,11 @@ public interface DiaryService {
 
     Result<DiaryVO> updateDiary(UpdateDiaryDTO updateDiaryDTO);
 
-    Result<Void> deleteDiary(Long diaryId);
+    Result<Void> deleteDiary(Long diaryId, Long userId);
 
-    Result<DiaryVO> getDiaryById(Long diaryId);
+    Result<DiaryVO> getDiaryById(Long diaryId, Long userId);
 
     Result<List<DiaryVO>> findDiaries(QueryDiaryDTO queryDiaryDTO, Long userId);
 
-    Result<Void> deleteDiaryMedia(Long mediaId);
+    Result<Void> deleteDiaryMedia(Long mediaId, Long userId);
 } 

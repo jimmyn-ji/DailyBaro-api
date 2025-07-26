@@ -33,13 +33,19 @@ public class AnonymousPostServiceImpl implements AnonymousPostService {
 
     @Autowired
     private PostCommentMapper postCommentMapper;
+    @Autowired
+    private com.project.mapper.CommentMapper commentMapper;
 
     @Override
     public Result<AnonymousPostVO> createPost(CreateAnonymousPostDTO createDTO, Long userId) {
+        log.info("接收到的创建动态数据: content={}, visibility={}", createDTO.getContent(), createDTO.getVisibility());
+
         AnonymousPost post = new AnonymousPost();
         BeanUtils.copyProperties(createDTO, post);
         post.setUserId(userId);
         post.setCreateTime(new Date());
+
+        log.info("转换后的AnonymousPost对象: userId={}, content={}, visibility={}", post.getUserId(), post.getContent(), post.getVisibility());
 
         anonymousPostMapper.insert(post);
         log.info("用户 {} 创建了一个新的匿名帖子，ID: {}", userId, post.getPostId());
@@ -66,25 +72,34 @@ public class AnonymousPostServiceImpl implements AnonymousPostService {
     }
 
     @Override
-    public Result<List<AnonymousPostVO>> getPublicPosts() {
+    public Result<List<AnonymousPostVO>> getPublicPosts(Long currentUserId) {
+        // 查询公开动态 + 当前用户的私有动态
         QueryWrapper<AnonymousPost> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("visibility", "public").orderByDesc("create_time");
+        queryWrapper.and(wrapper -> wrapper
+            .eq("visibility", "public")
+            .or()
+            .eq("visibility", "private").eq("user_id", currentUserId)
+        ).orderByDesc("create_time");
         List<AnonymousPost> posts = anonymousPostMapper.selectList(queryWrapper);
 
         List<AnonymousPostVO> vos = posts.stream()
-                .map(this::convertToVO)
+                .map(post -> convertToVO(post, currentUserId))
                 .collect(Collectors.toList());
 
         return Result.success(vos);
     }
 
     @Override
-    public Result<AnonymousPostVO> getPostById(Long postId) {
+    public Result<AnonymousPostVO> getPostById(Long postId, Long userId) {
         AnonymousPost post = anonymousPostMapper.selectById(postId);
         if (post == null) {
             return Result.fail("帖子不存在");
         }
-        return Result.success(convertToVO(post));
+        AnonymousPostVO vo = convertToVO(post, userId);
+        // 查询评论
+        java.util.List<com.project.model.Comments> comments = commentMapper.getCommentsByPostId(postId);
+        vo.setComments(comments);
+        return Result.success(vo);
     }
 
     @Override
@@ -116,6 +131,10 @@ public class AnonymousPostServiceImpl implements AnonymousPostService {
     }
 
     private AnonymousPostVO convertToVO(AnonymousPost post) {
+        return convertToVO(post, null);
+    }
+
+    private AnonymousPostVO convertToVO(AnonymousPost post, Long currentUserId) {
         AnonymousPostVO vo = new AnonymousPostVO();
         BeanUtils.copyProperties(post, vo);
 
@@ -125,11 +144,16 @@ public class AnonymousPostServiceImpl implements AnonymousPostService {
         vo.setLikeCount(postLikeMapper.selectCount(likeQuery).intValue());
 
         // 获取评论数
-        // Assuming PostCommentMapper is also available
-        // QueryWrapper<PostComment> commentQuery = new QueryWrapper<>();
-        // commentQuery.eq("post_id", post.getPostId());
-        // vo.setCommentCount(postCommentMapper.selectCount(commentQuery).intValue());
         vo.setCommentCount(0); // Placeholder for now
+
+        // 设置当前用户是否已点赞（使用真实的用户ID）
+        if (currentUserId != null) {
+            QueryWrapper<PostLike> userLikeQuery = new QueryWrapper<>();
+            userLikeQuery.eq("post_id", post.getPostId()).eq("user_id", currentUserId);
+            vo.setLiked(postLikeMapper.selectCount(userLikeQuery) > 0);
+        } else {
+            vo.setLiked(false); // 如果用户未登录，默认未点赞
+        }
 
         return vo;
     }

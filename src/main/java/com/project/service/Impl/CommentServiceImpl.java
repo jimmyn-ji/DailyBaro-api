@@ -83,17 +83,21 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Result<CommentVO> insertComment(InsertCommentDTO insertCommentDTO) {
+        log.info("接收到的评论数据: {}", insertCommentDTO);
+        
         Comments comments = new Comments();
         BeanUtils.copyProperties(insertCommentDTO, comments);
+        
+        log.info("转换后的Comments对象: {}", comments);
 
-        // 设置 postId 为当前记录的值
-        comments.setPostId(currentPostId);
+        // 确保 postId 不为空
+        if (comments.getPostId() == null) {
+            log.error("postId 为空，原始数据: {}", insertCommentDTO);
+            return Result.fail("postId 不能为空");
+        }
 
         // 插入评论
         commentMapper.insertComment(comments);
-
-        // postId 自增
-        currentPostId++;
 
         return Result.success(convertToVO(comments));
     }
