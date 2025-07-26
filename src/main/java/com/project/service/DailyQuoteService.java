@@ -5,4 +5,5 @@ import com.project.util.Result;
 
 public interface DailyQuoteService {
     Result<DailyQuote> getRandomQuote();
+    Result<DailyQuote> getRandomQuoteForUser(Long userId);
 } 

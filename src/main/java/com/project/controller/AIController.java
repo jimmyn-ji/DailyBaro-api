@@ -12,16 +12,32 @@ public class AIController {
 
     @Autowired
     @Qualifier("deepSeekAIService") // 使用DeepSeek AI
-    private AIService aiService;
+    private AIService deepSeekAIService;
+    
+    @Autowired
+    @Qualifier("mockAIService") // 备用Mock AI
+    private AIService mockAIService;
 
     @PostMapping("/query")
     public Result<String> askGeneralQuestion(@RequestBody AIQueryDTO query) {
-        return aiService.getGeneralResponse(query.getQuestion());
+        // 首先尝试DeepSeek，如果失败则使用Mock AI
+        Result<String> result = deepSeekAIService.getGeneralResponse(query.getQuestion());
+        if (result.getCode() != 200) {
+            // DeepSeek失败，使用Mock AI
+            return mockAIService.getGeneralResponse(query.getQuestion());
+        }
+        return result;
     }
 
     @PostMapping("/diary-feedback")
     public Result<String> getDiaryFeedback(@RequestBody AIDiaryFeedbackDTO feedbackRequest) {
-        return aiService.getResponseForDiary(feedbackRequest.getDiaryContent());
+        // 首先尝试DeepSeek，如果失败则使用Mock AI
+        Result<String> result = deepSeekAIService.getResponseForDiary(feedbackRequest.getDiaryContent());
+        if (result.getCode() != 200) {
+            // DeepSeek失败，使用Mock AI
+            return mockAIService.getResponseForDiary(feedbackRequest.getDiaryContent());
+        }
+        return result;
     }
 
     // Simple DTOs for request bodies

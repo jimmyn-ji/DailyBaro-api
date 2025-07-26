@@ -2,10 +2,14 @@ package com.project.service.Impl;
 
 import com.project.service.AIService;
 import com.project.util.Result;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 
 import java.util.*;
 
@@ -18,7 +22,8 @@ public class DeepSeekAIServiceImpl implements AIService {
     @Value("${deepseek.api-key}")
     private String apiKey;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Override
     public Result<String> getGeneralResponse(String question) {
@@ -35,26 +40,26 @@ public class DeepSeekAIServiceImpl implements AIService {
     }
 
     private Result<String> callDeepSeek(String prompt) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(apiKey);
-
-        Map<String, Object> body = new HashMap<>();
-        body.put("model", "deepseek-chat");
-        List<Map<String, String>> messages = new ArrayList<>();
-        Map<String, String> systemMsg = new HashMap<>();
-        systemMsg.put("role", "system");
-        systemMsg.put("content", "你是一个情绪分析师。");
-        messages.add(systemMsg);
-        Map<String, String> userMsg = new HashMap<>();
-        userMsg.put("role", "user");
-        userMsg.put("content", prompt);
-        messages.add(userMsg);
-        body.put("messages", messages);
-
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
-
         try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(apiKey);
+
+            Map<String, Object> body = new HashMap<>();
+            body.put("model", "deepseek-chat");
+            List<Map<String, String>> messages = new ArrayList<>();
+            Map<String, String> systemMsg = new HashMap<>();
+            systemMsg.put("role", "system");
+            systemMsg.put("content", "你是一个情绪分析师。");
+            messages.add(systemMsg);
+            Map<String, String> userMsg = new HashMap<>();
+            userMsg.put("role", "user");
+            userMsg.put("content", prompt);
+            messages.add(userMsg);
+            body.put("messages", messages);
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+
             ResponseEntity<Map> response = restTemplate.postForEntity(apiUrl, entity, Map.class);
             List choices = (List) response.getBody().get("choices");
             if (choices != null && !choices.isEmpty()) {
@@ -64,7 +69,17 @@ public class DeepSeekAIServiceImpl implements AIService {
                 return Result.success(content);
             }
             return Result.fail("AI无有效回复");
+        } catch (ResourceAccessException e) {
+            // 网络连接问题
+            return Result.fail("AI服务连接失败: " + e.getMessage());
+        } catch (HttpClientErrorException e) {
+            // HTTP 4xx 错误（如认证失败）
+            return Result.fail("AI服务认证失败: " + e.getMessage());
+        } catch (HttpServerErrorException e) {
+            // HTTP 5xx 错误（服务器错误）
+            return Result.fail("AI服务暂时不可用: " + e.getMessage());
         } catch (Exception e) {
+            // 其他异常
             return Result.fail("AI服务调用失败: " + e.getMessage());
         }
     }
