@@ -13,4 +13,7 @@ public interface EmotionCapsuleService {
     Result<EmotionCapsuleVO> getCapsuleById(Long capsuleId, Long userId);
 
     Result<List<EmotionCapsuleVO>> listUserCapsules(Long userId);
+
+    Result<List<EmotionCapsuleVO>> getUnreadReminders(Long userId);
+    Result<?> markReminderRead(Long capsuleId, Long userId);
 } 

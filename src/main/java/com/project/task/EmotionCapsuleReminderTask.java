@@ -36,13 +36,21 @@ public class EmotionCapsuleReminderTask {
         for (EmotionCapsule capsule : dueCapsules) {
             // 查找用户邮箱
             User user = userMapper.getMyInfo(capsule.getUserId());
-            if (user != null && user.getEmail() != null) {
-                String to = user.getEmail();
-                String subject = "情绪胶囊开启提醒";
-                String content = "您的情绪胶囊已到开启时间，请登录App查看！";
-                mailService.sendSimpleMail(to, subject, content);
+            if (user != null) {
+                if ("sms".equals(capsule.getReminderType())) {
+                    // TODO: 调用短信API发送短信提醒
+                    // smsService.sendSms(user.getPhone(), "您的情绪胶囊已到开启时间，请登录App查看！");
+                } else if ("app_notification".equals(capsule.getReminderType())) {
+                    // 应用内提醒只需设置reminder_sent=1，前端会弹窗
+                }
+                // 邮件提醒（可选）
+                if (user.getEmail() != null) {
+                    String to = user.getEmail();
+                    String subject = "情绪胶囊开启提醒";
+                    String content = "您的情绪胶囊已到开启时间，请登录App查看！";
+                    mailService.sendSimpleMail(to, subject, content);
+                }
             }
-            // TODO: App内推送接口预留
             capsule.setReminderSent(1);
             capsuleMapper.updateById(capsule);
         }

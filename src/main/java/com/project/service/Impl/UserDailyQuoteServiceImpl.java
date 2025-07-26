@@ -7,10 +7,10 @@ import com.project.service.UserDailyQuoteService;
 import com.project.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.Date;
+
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Calendar;
+import java.util.Date;
 
 @Service
 public class UserDailyQuoteServiceImpl implements UserDailyQuoteService {
@@ -23,7 +23,7 @@ public class UserDailyQuoteServiceImpl implements UserDailyQuoteService {
                 new QueryWrapper<UserDailyQuote>().eq("user_id", userId)
         );
         if (quote == null) {
-            return Result.fail("暂无自定义日签");
+            return Result.success(null); // 查不到时返回null，前端才能继续请求随机日签
         }
         return Result.success(quote);
     }

@@ -148,9 +148,9 @@ public class AnonymousPostServiceImpl implements AnonymousPostService {
 
         // 设置当前用户是否已点赞（使用真实的用户ID）
         if (currentUserId != null) {
-            QueryWrapper<PostLike> userLikeQuery = new QueryWrapper<>();
+        QueryWrapper<PostLike> userLikeQuery = new QueryWrapper<>();
             userLikeQuery.eq("post_id", post.getPostId()).eq("user_id", currentUserId);
-            vo.setLiked(postLikeMapper.selectCount(userLikeQuery) > 0);
+        vo.setLiked(postLikeMapper.selectCount(userLikeQuery) > 0);
         } else {
             vo.setLiked(false); // 如果用户未登录，默认未点赞
         }

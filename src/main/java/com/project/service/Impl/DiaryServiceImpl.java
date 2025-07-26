@@ -238,8 +238,8 @@ public class DiaryServiceImpl implements DiaryService {
             return Result.fail("无权删除此媒体文件");
         }
         
-        deletePhysicalFile(media.getMediaUrl());
-        diaryMediaMapper.deleteById(mediaId);
+            deletePhysicalFile(media.getMediaUrl());
+            diaryMediaMapper.deleteById(mediaId);
         return Result.success();
     }
 

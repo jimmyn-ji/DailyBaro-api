@@ -12,6 +12,7 @@ public class MockAIServiceImpl implements AIService {
 
     private static final Map<String, String> DIARY_KEYWORD_RESPONSES = new HashMap<>();
     private static final Map<String, String> GENERAL_QUESTION_RESPONSES = new HashMap<>();
+    private static final Map<String, String> EMOTION_ANALYSIS_RESPONSES = new HashMap<>();
 
     static {
         // 日记关键词自动建议
@@ -39,6 +40,14 @@ public class MockAIServiceImpl implements AIService {
         GENERAL_QUESTION_RESPONSES.put("如何管理愤怒", "愤怒时可以尝试深呼吸、短暂离开现场，等情绪平复后再处理问题。");
         GENERAL_QUESTION_RESPONSES.put("如何克服自卑", "多关注自己的优点，设立并完成小目标，逐步建立自信。");
         GENERAL_QUESTION_RESPONSES.put("如何缓解恐惧", "可以尝试逐步暴露法，或与信任的人交流你的感受，必要时寻求专业帮助。");
+
+        // 情绪分析快速响应
+        EMOTION_ANALYSIS_RESPONSES.put("积极", "您的情绪状态较为积极，建议继续保持乐观心态，适当分享快乐给身边的人。");
+        EMOTION_ANALYSIS_RESPONSES.put("消极", "检测到消极情绪，建议多进行户外活动，与朋友交流，必要时寻求专业帮助。");
+        EMOTION_ANALYSIS_RESPONSES.put("波动", "情绪波动较大，建议保持规律作息，学习情绪管理技巧，建立稳定的情绪调节机制。");
+        EMOTION_ANALYSIS_RESPONSES.put("稳定", "情绪状态稳定，建议继续保持当前的生活方式，适当增加一些新的兴趣爱好。");
+        EMOTION_ANALYSIS_RESPONSES.put("焦虑", "存在焦虑情绪，建议进行深呼吸练习，减少咖啡因摄入，保持充足睡眠。");
+        EMOTION_ANALYSIS_RESPONSES.put("抑郁", "情绪偏低，建议增加户外活动，与亲友多交流，必要时寻求心理咨询。");
     }
 
     @Override
@@ -53,6 +62,11 @@ public class MockAIServiceImpl implements AIService {
 
     @Override
     public Result<String> getResponseForDiary(String diaryContent) {
+        // 检查是否是情绪分析请求
+        if (diaryContent.contains("情绪数据") || diaryContent.contains("情绪波动") || diaryContent.contains("情绪分布")) {
+            return getEmotionAnalysisResponse(diaryContent);
+        }
+        
         for (Map.Entry<String, String> entry : DIARY_KEYWORD_RESPONSES.entrySet()) {
             if (diaryContent.contains(entry.getKey())) {
                 return Result.success(entry.getValue());
@@ -60,5 +74,18 @@ public class MockAIServiceImpl implements AIService {
         }
         // If no keywords are found, we can return a generic supportive message
         return Result.success("感谢你的记录，很高兴能成为你的倾听者。");
+    }
+    
+    private Result<String> getEmotionAnalysisResponse(String emotionData) {
+        // 快速分析情绪数据并给出建议
+        if (emotionData.contains("积极") || emotionData.contains("开心")) {
+            return Result.success("根据您的情绪数据，整体情绪状态积极向上。建议继续保持乐观心态，适当分享快乐给身边的人，同时注意情绪的持续稳定性。");
+        } else if (emotionData.contains("消极") || emotionData.contains("难过") || emotionData.contains("焦虑")) {
+            return Result.success("检测到您的情绪存在波动和消极倾向。建议多进行户外活动，与朋友交流，学习情绪管理技巧，必要时寻求专业帮助。");
+        } else if (emotionData.contains("波动")) {
+            return Result.success("您的情绪波动较大，建议保持规律作息，学习深呼吸等放松技巧，建立稳定的情绪调节机制。");
+        } else {
+            return Result.success("基于您的情绪数据，建议保持当前的生活方式，适当增加户外活动和社交互动，有助于情绪的稳定和提升。");
+        }
     }
 } 

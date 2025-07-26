@@ -7,6 +7,7 @@ import java.util.List;
 @Data
 public class EmotionCapsuleVO {
     private Long capsuleId;
+    private Long userId;
     private Date openTime;
     private Date createTime;
     private boolean isOpened;
@@ -14,4 +15,7 @@ public class EmotionCapsuleVO {
     // These fields are only populated if isOpened is true
     private String content;
     private List<MediaVO> media;
+    private String reminderType;
+    private Integer reminderSent;
+    private Integer reminderRead;
 } 

@@ -11,10 +11,13 @@ import java.util.List;
 public class CreateCapsuleDTO {
     private String content;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private Date openTime;
 
     private String reminderType; // "app_notification" or "sms"
 
     private List<MultipartFile> mediaFiles;
+
+    private Integer reminderSent;
+    private Integer reminderRead;
 } 

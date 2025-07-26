@@ -43,6 +43,7 @@ public class EmotionCapsuleServiceImpl implements EmotionCapsuleService {
         BeanUtils.copyProperties(createDTO, capsule);
         capsule.setUserId(userId);
         capsule.setCreateTime(new Date());
+        capsule.setReminderType(createDTO.getReminderType()); // 保存提醒方式
 
         capsuleMapper.insert(capsule);
 
@@ -54,8 +55,40 @@ public class EmotionCapsuleServiceImpl implements EmotionCapsuleService {
                     CapsuleMedia media = new CapsuleMedia();
                     media.setCapsuleId(capsule.getCapsuleId());
                     media.setMediaUrl(uploadResult.getData());
-                    // Simplified media type determination
-                    media.setMediaType(file.getContentType() != null && file.getContentType().startsWith("image") ? "image" : "other");
+                    
+                    // 改进媒体类型识别
+                    String contentType = file.getContentType();
+                    String fileName = file.getOriginalFilename();
+                    String mediaType = "other";
+                    
+                    if (contentType != null) {
+                        if (contentType.startsWith("image/")) {
+                            mediaType = "image";
+                        } else if (contentType.startsWith("audio/")) {
+                            mediaType = "audio";
+                        } else if (contentType.startsWith("video/")) {
+                            mediaType = "video";
+                        }
+                    }
+                    // 文件名后缀优先判断
+                    if (fileName != null) {
+                        String lowerFileName = fileName.toLowerCase();
+                        if (lowerFileName.endsWith(".jpg") || lowerFileName.endsWith(".jpeg") || 
+                            lowerFileName.endsWith(".png") || lowerFileName.endsWith(".gif") ||
+                            lowerFileName.endsWith(".webp") || lowerFileName.endsWith(".bmp")) {
+                            mediaType = "image";
+                        } else if (lowerFileName.endsWith(".mp3") || lowerFileName.endsWith(".wav") ||
+                                   lowerFileName.endsWith(".ogg") || lowerFileName.endsWith(".aac") ||
+                                   lowerFileName.endsWith(".m4a") || lowerFileName.endsWith(".ncm")) {
+                            mediaType = "audio";
+                        } else if (lowerFileName.endsWith(".mp4") || lowerFileName.endsWith(".avi") ||
+                                   lowerFileName.endsWith(".mov") || lowerFileName.endsWith(".wmv") ||
+                                   lowerFileName.endsWith(".flv")) {
+                            mediaType = "video";
+                        }
+                    }
+                    
+                    media.setMediaType(mediaType);
                     mediaMapper.insert(media);
                 } else {
                     log.error("Failed to upload file for capsule {}: {}", capsule.getCapsuleId(), uploadResult.getMessage());
@@ -85,6 +118,34 @@ public class EmotionCapsuleServiceImpl implements EmotionCapsuleService {
                 .collect(Collectors.toList());
 
         return Result.success(vos);
+    }
+
+    @Override
+    public Result<List<EmotionCapsuleVO>> getUnreadReminders(Long userId) {
+        Date now = new Date();
+        QueryWrapper<EmotionCapsule> query = new QueryWrapper<>();
+        query.eq("user_id", userId)
+             .le("open_time", now)
+             .eq("reminder_sent", 0);
+        List<EmotionCapsule> dueCapsules = capsuleMapper.selectList(query);
+        // 立即将这些胶囊的reminder_sent设为1
+        for (EmotionCapsule capsule : dueCapsules) {
+            capsule.setReminderSent(1);
+            capsuleMapper.updateById(capsule);
+        }
+        List<EmotionCapsuleVO> voList = dueCapsules.stream().map(this::convertToVO).collect(Collectors.toList());
+        return Result.success(voList);
+    }
+
+    @Override
+    public Result<?> markReminderRead(Long capsuleId, Long userId) {
+        EmotionCapsule capsule = capsuleMapper.selectById(capsuleId);
+        if (capsule == null || !capsule.getUserId().equals(userId)) {
+            return Result.fail("无权操作");
+        }
+        capsule.setReminderRead(1);
+        capsuleMapper.updateById(capsule);
+        return Result.success();
     }
 
     private EmotionCapsuleVO convertToVO(EmotionCapsule capsule) {

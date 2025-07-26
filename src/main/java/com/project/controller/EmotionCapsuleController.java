@@ -7,6 +7,7 @@ import com.project.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -16,21 +17,63 @@ public class EmotionCapsuleController {
     @Autowired
     private EmotionCapsuleService capsuleService;
 
-    // Placeholder for the logged-in user ID
-    private static final Long MOCK_USER_ID = 1L;
-
     @PostMapping
-    public Result<EmotionCapsuleVO> createCapsule(@ModelAttribute CreateCapsuleDTO createDTO) {
-        return capsuleService.createCapsule(createDTO, MOCK_USER_ID);
+    public Result<EmotionCapsuleVO> createCapsule(@ModelAttribute CreateCapsuleDTO createDTO, HttpServletRequest request) {
+        Long userId = getUserIdFromRequest(request);
+        if (userId == null) {
+            return Result.fail("用户未登录");
+        }
+        return capsuleService.createCapsule(createDTO, userId);
     }
 
     @GetMapping
-    public Result<List<EmotionCapsuleVO>> listMyCapsules() {
-        return capsuleService.listUserCapsules(MOCK_USER_ID);
+    public Result<List<EmotionCapsuleVO>> listMyCapsules(HttpServletRequest request) {
+        Long userId = getUserIdFromRequest(request);
+        if (userId == null) {
+            return Result.fail("用户未登录");
+        }
+        return capsuleService.listUserCapsules(userId);
     }
 
     @GetMapping("/{id}")
-    public Result<EmotionCapsuleVO> getCapsule(@PathVariable("id") Long capsuleId) {
-        return capsuleService.getCapsuleById(capsuleId, MOCK_USER_ID);
+    public Result<EmotionCapsuleVO> getCapsule(@PathVariable("id") Long capsuleId, HttpServletRequest request) {
+        Long userId = getUserIdFromRequest(request);
+        if (userId == null) {
+            return Result.fail("用户未登录");
+        }
+        return capsuleService.getCapsuleById(capsuleId, userId);
+    }
+    
+    @GetMapping("/reminders/unread")
+    public Result<List<EmotionCapsuleVO>> getUnreadReminders(HttpServletRequest request) {
+        Long userId = getUserIdFromRequest(request);
+        if (userId == null) {
+            return Result.fail("用户未登录");
+        }
+        return capsuleService.getUnreadReminders(userId);
+    }
+
+    @PostMapping("/reminders/read/{id}")
+    public Result<?> markReminderRead(@PathVariable("id") Long capsuleId, HttpServletRequest request) {
+        Long userId = getUserIdFromRequest(request);
+        if (userId == null) {
+            return Result.fail("用户未登录");
+        }
+        return capsuleService.markReminderRead(capsuleId, userId);
+    }
+    
+    /**
+     * 从请求头中获取用户ID
+     */
+    private Long getUserIdFromRequest(HttpServletRequest request) {
+        String uidHeader = request.getHeader("uid");
+        if (uidHeader != null && !uidHeader.trim().isEmpty()) {
+            try {
+                return Long.parseLong(uidHeader.trim());
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+        return null;
     }
 } 
